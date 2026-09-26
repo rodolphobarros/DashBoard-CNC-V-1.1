@@ -1,16 +1,18 @@
-async function carregarMensagem() {
-  const mensagem = document.querySelector('#mensagem');
+// UI
+import './components/ui/button/button.js';
+import './components/ui/panel/card.js';
 
-  try {
-    const resposta = await fetch('/api/hello');
-    const texto = await resposta.text();
+// Structure
+import './components/structure/header.js';
+import './components/structure/body.js';
+import './components/structure/footer.js';
 
-    mensagem.textContent = texto;
-  } catch (erro) {
-    console.error('Erro ao carregar mensagem:', erro);
+// Socket
+import './socket/socketClient.js';
 
-    mensagem.textContent = 'Erro ao comunicar com o servidor.';
-  }
-}
-
-carregarMensagem();
+// Display
+import './components/display/axis-position.js';
+import './components/display/thermal-monitor.js';
+import './components/display/camera-telemetry.js';
+import './components/display/emergency.js';
+import './components/display/gcode-panel.js';

@@ -1,0 +1,119 @@
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: var(--space-md) var(--space-lg);
+
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.header-brand h1 {
+  margin: 0;
+
+  font-family: var(--font-ui);
+  font-size: var(--fs-title);
+  font-weight: 600;
+}
+
+.header-subtitle {
+  font-family: var(--font-ui);
+  font-size: var(--fs-label);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  font-family: var(--font-ui);
+  font-size: var(--fs-label);
+  color: var(--color-text);
+}
+
+.connection-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+
+  background: var(--color-secondary-border);
+}
+
+.connection-status.is-connecting .connection-status__dot {
+  background: var(--color-danger);
+}
+
+.connection-status.is-connected .connection-status__dot {
+  background: var(--color-online);
+}
+
+.connection-status.is-connected .connection-status__label {
+  color: var(--color-online);
+  font-weight: 600;
+}
+
+.connect-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.connect-modal-backdrop[hidden] {
+  display: none;
+}
+
+.connect-modal {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+
+  min-width: 240px;
+  padding: var(--space-lg);
+
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.connect-modal__title {
+  margin: 0;
+
+  font-family: var(--font-ui);
+  font-size: var(--fs-title);
+  font-weight: 600;
+  text-align: center;
+}
+
+.connect-modal__options {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+@media (max-width: 600px) {
+  .dashboard-header {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+  }
+}

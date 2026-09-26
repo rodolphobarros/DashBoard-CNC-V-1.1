@@ -1,0 +1,268 @@
+/* =========================================
+   AXIS POSITION
+========================================= */
+
+.axis-position {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   SECTION HEADER
+========================================= */
+
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.section-header h2 {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: var(--fs-title);
+  color: var(--color-text);
+}
+
+/* =========================================
+   MAIN LAYOUT
+   JOG | AXIS POSITION
+========================================= */
+
+.axis-position-layout {
+  display: grid;
+  grid-template-columns: minmax(250px, 1fr) minmax(130px, auto);
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+/* =========================================
+   JOG PANEL
+========================================= */
+
+.jog-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* =========================================
+   STEP SELECTOR
+========================================= */
+
+.jog-step-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.jog-step-selector label {
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: var(--fs-label);
+}
+
+.jog-step-selector select {
+  padding: var(--space-xs) var(--space-sm);
+
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+
+  font-family: var(--font-data);
+  font-size: var(--fs-value);
+}
+
+/* =========================================
+   JOG PAD
+========================================= */
+
+.jog-pad {
+  display: grid;
+
+  grid-template-columns: repeat(4, 56px);
+  grid-template-rows: repeat(3, 56px);
+
+  gap: var(--space-sm);
+}
+
+/* =========================================
+   JOG BUTTONS
+========================================= */
+
+.jog-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 56px;
+  height: 56px;
+  padding: 0;
+
+  box-sizing: border-box;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+
+  font-family: var(--font-data);
+  font-size: var(--fs-label);
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.jog-button:hover {
+  background: var(--color-text);
+  color: var(--color-bg);
+}
+
+.jog-button:active {
+  background: var(--color-border);
+  color: var(--color-bg);
+}
+
+/* =========================================
+   JOG BUTTON POSITIONS
+========================================= */
+
+/* X / Y */
+
+.jog-pos-x {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.jog-neg-y {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.jog-pos-y {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.jog-neg-x {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+/* Z */
+
+.jog-pos-z {
+  grid-column: 4;
+  grid-row: 1;
+}
+
+.jog-neg-z {
+  grid-column: 4;
+  grid-row: 3;
+}
+
+/* =========================================
+   AXIS INFORMATION
+========================================= */
+
+.axis-position-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+/* =========================================
+   AXIS CARD
+========================================= */
+
+.axis-card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: auto auto;
+
+  min-width: 120px;
+  min-height: 54px;
+
+  padding: var(--space-sm);
+
+  box-sizing: border-box;
+
+  background: var(--color-bg);
+  color: var(--color-text);
+
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+/* =========================================
+   AXIS LABEL
+========================================= */
+
+.axis-label {
+  grid-column: 1 / -1;
+
+  margin: 0;
+
+  font-family: var(--font-ui);
+  font-size: var(--fs-label);
+  color: var(--color-text);
+}
+
+/* =========================================
+   AXIS VALUE
+========================================= */
+
+.axis-value {
+  grid-column: 1;
+
+  margin-top: var(--space-xs);
+
+  font-family: var(--font-data);
+  font-size: var(--fs-value);
+  font-weight: 600;
+
+  color: var(--color-text);
+}
+
+/* =========================================
+   AXIS UNIT
+========================================= */
+
+.axis-unit {
+  grid-column: 2;
+  align-self: end;
+
+  margin-top: var(--space-xs);
+
+  font-family: var(--font-data);
+  font-size: var(--fs-label);
+
+  color: var(--color-text);
+}
+
+/* =========================================
+   RESPONSIVE
+========================================= */
+
+@media (max-width: 600px) {
+  .axis-position-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .axis-position-content {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-sm);
+  }
+
+  .axis-card {
+    min-width: 0;
+  }
+}

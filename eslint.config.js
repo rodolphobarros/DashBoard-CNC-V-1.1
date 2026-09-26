@@ -3,98 +3,44 @@ import globals from 'globals';
 import eslintConfigPrettier from 'eslint-config-prettier';
 
 export default [
-  // ==========================================================
-  // Arquivos ignorados
-  // ==========================================================
-  {
-    ignores: [
-      'node_modules/**',
-      'coverage/**',
-      'dist/**',
-      'build/**',
-      'logs/**',
-      '.cache/**',
-    ],
-  },
-
-  // ==========================================================
-  // Regras recomendadas
-  // ==========================================================
   js.configs.recommended,
 
-  // ==========================================================
-  // Backend - Node.js
-  // ==========================================================
+  // ============================================
+  // BACKEND — server-side code (Node.js)
+  // ============================================
   {
     files: ['src/**/*.js'],
-
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-
       globals: {
         ...globals.node,
       },
     },
-
-    rules: {
-      'no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
-      'no-console': 'off',
-    },
   },
 
-  // ==========================================================
-  // Frontend - Browser
-  // ==========================================================
+  // ============================================
+  // FRONTEND — browser-side code
+  // ============================================
   {
-    files: ['public/**/*.js'],
-
+    files: ['public/js/**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'module',
-
       globals: {
         ...globals.browser,
+        io: 'readonly',
       },
-    },
-
-    rules: {
-      'no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
-      'no-console': 'off',
     },
   },
 
-  // ==========================================================
-  // Testes
-  // ==========================================================
+  // ============================================
+  // IGNORED DIRECTORIES
+  // ============================================
   {
-    files: ['test/**/*.js', 'tests/**/*.js'],
-
-    languageOptions: {
-      ecmaVersion: 'latest',
-      sourceType: 'module',
-
-      globals: {
-        ...globals.node,
-      },
-    },
+    ignores: ['node_modules/**', 'logs/**'],
   },
 
-  // ==========================================================
-  // Evitar conflitos ESLint x Prettier
-  // Deve permanecer no final
-  // ==========================================================
+  // Must be last — disables rules that conflict with Prettier
   eslintConfigPrettier,
 ];

@@ -1,0 +1,53 @@
+:root {
+  /* ===== Colors ===== */
+
+  /* Base */
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-text-dim: #ffffff;
+  --color-border: #000000;
+
+  /* State */
+  --color-online: #2e7d32;
+  --color-surface-alt: #ffffff;
+
+  /* Danger */
+  --color-danger: #c0392b;
+  --color-danger-hover: #a93226;
+
+  /* Primary button */
+  --color-primary-bg: #000000;
+  --color-primary-bg-hover: #000000;
+  --color-primary-text: #ffffff;
+
+  /* Secondary button */
+  --color-secondary-bg: #ffffff;
+  --color-secondary-bg-hover: #ffffff;
+  --color-secondary-text: #000000;
+  --color-secondary-border: #000000;
+
+  /* Disabled button */
+  --color-disabled-bg: #ffffff;
+  --color-disabled-text: #ffffff;
+
+  /* ===== Typography ===== */
+
+  --font-ui: sans-serif;
+  --font-data: monospace;
+
+  --fs-xxl: 1.2rem;
+  --fs-title: 1rem;
+  --fs-label: 0.7rem;
+  --fs-value: 0.8rem;
+
+  /* ===== Spacing ===== */
+
+  --space-xs: 0.2rem;
+  --space-sm: 0.4rem;
+  --space-md: 0.6rem;
+  --space-lg: 1rem;
+
+  /* ===== Border radius ===== */
+
+  --radius: 6px;
+}

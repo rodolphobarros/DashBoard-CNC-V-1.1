@@ -1,0 +1,103 @@
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.camera-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.camera-stream {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.camera-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+
+  text-align: center;
+  color: var(--color-text);
+}
+
+.camera-placeholder-title {
+  font-size: var(--fs-title);
+  font-weight: 600;
+}
+
+.camera-placeholder-text {
+  font-size: var(--fs-label);
+  color: var(--color-text-dim);
+}
+
+.camera-info {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.camera-status,
+.camera-name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.telemetry-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.telemetry-header {
+  font-size: var(--fs-label);
+  font-weight: 600;
+}
+
+.telemetry-log {
+  max-height: 200px;
+  overflow-y: auto;
+
+  padding: var(--space-sm);
+
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.telemetry-log ul {
+  list-style: none;
+}
+
+.telemetry-log li {
+  padding: var(--space-xs) 0;
+
+  font-family: var(--font-data);
+  font-size: var(--fs-value);
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.telemetry-log li:last-child {
+  border-bottom: none;
+}
+
+.parameter-label {
+  font-size: var(--fs-label);
+  color: var(--color-text-dim);
+}
+
+.parameter-value {
+  font-family: var(--font-data);
+  font-size: var(--fs-value);
+  font-weight: 600;
+  color: var(--color-text);
+}

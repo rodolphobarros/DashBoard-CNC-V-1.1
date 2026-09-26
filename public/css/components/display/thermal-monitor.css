@@ -1,0 +1,50 @@
+.section-header {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.thermal-monitor-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-sm);
+}
+
+.temperature-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+
+  padding: var(--space-sm);
+
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+}
+
+.temperature-label {
+  font-size: var(--fs-label);
+  color: var(--color-text);
+}
+
+.temperature-value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xs);
+
+  font-family: var(--font-data);
+  font-size: var(--fs-xxl);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.temperature-unit {
+  font-size: var(--fs-label);
+  color: var(--color-text-dim);
+}
+
+@media (max-width: 500px) {
+  .thermal-monitor-content {
+    grid-template-columns: 1fr;
+  }
+}

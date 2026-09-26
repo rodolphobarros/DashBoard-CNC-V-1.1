@@ -1,0 +1,189 @@
+/*
+ * ============================================================
+ * CNC MACHINE — FRONTEND SOCKET
+ *
+ * Purpose:
+ *   Centralize all frontend Socket.IO communication.
+ * ============================================================
+ */
+
+const socket = io();
+
+function dispatchWindowEvent(name, detail) {
+  window.dispatchEvent(
+    new CustomEvent(name, {
+      detail,
+    })
+  );
+}
+
+function createDisconnectedState() {
+  return {
+    source: null,
+    connection: 'DISCONNECTED',
+    status: null,
+    emergency: false,
+    lastEmergencyAt: null,
+    emergencyCount: 0,
+    holdReason: null,
+    position: null,
+    feedRate: null,
+    spindleSpeed: null,
+    driverTemp: null,
+    spindleTemp: null,
+    alarms: [],
+    capabilities: {
+      jog: false,
+      emergency: false,
+    },
+  };
+}
+
+/*
+ * ============================================================
+ * SERVER CONNECTION
+ * ============================================================
+ */
+
+socket.on('connect', () => {
+  console.log(`[Socket] Server connected: ${socket.id}`);
+
+  dispatchWindowEvent('cnc:server-state', {
+    connected: true,
+    reason: null,
+  });
+});
+
+socket.on('disconnect', (reason) => {
+  console.warn(`[Socket] Server disconnected: ${reason}`);
+
+  dispatchWindowEvent('cnc:server-state', {
+    connected: false,
+    reason,
+  });
+
+  dispatchWindowEvent('cnc:state', createDisconnectedState());
+});
+
+socket.on('connect_error', (error) => {
+  console.error('[Socket] Failed to connect to server:', error.message);
+
+  dispatchWindowEvent('cnc:server-state', {
+    connected: false,
+    reason: error.message,
+  });
+
+  dispatchWindowEvent('cnc:state', createDisconnectedState());
+
+  dispatchWindowEvent('cnc:connect-error', {
+    message: `Servidor indisponível: ${error.message}`,
+  });
+});
+
+/*
+ * ============================================================
+ * CNC STATE
+ * ============================================================
+ */
+
+socket.on('cnc:state', (state) => {
+  dispatchWindowEvent('cnc:state', state);
+});
+
+/*
+ * ============================================================
+ * CNC CONNECTION ERROR
+ * ============================================================
+ */
+
+socket.on('cnc:connect-error', (error) => {
+  console.error('[Socket] CNC connection error:', error);
+
+  dispatchWindowEvent('cnc:connect-error', error);
+});
+
+/*
+ * ============================================================
+ * COMMAND RESULTS
+ * ============================================================
+ */
+
+socket.on('cnc:command-result', (result) => {
+  if (result?.ok) {
+    console.log(`[Socket] ${result.command}: ${result.message}`);
+  } else {
+    console.warn(`[Socket] ${result?.command}: ${result?.message}`);
+  }
+
+  dispatchWindowEvent('cnc:command-result', result);
+});
+
+/*
+ * ============================================================
+ * SERIAL DATA
+ * ============================================================
+ */
+
+socket.on('cnc:serial-data', (line) => {
+  dispatchWindowEvent('cnc:serial-data', line);
+});
+
+/*
+ * ============================================================
+ * CNC COMMANDS
+ * ============================================================
+ */
+
+function emitCommand(eventName, payload) {
+  if (!socket.connected) {
+    dispatchWindowEvent('cnc:command-result', {
+      ok: false,
+      command: eventName,
+      message: 'Servidor indisponível',
+    });
+
+    return false;
+  }
+
+  if (payload === undefined) {
+    socket.emit(eventName);
+  } else {
+    socket.emit(eventName, payload);
+  }
+
+  return true;
+}
+
+function connectCNC(source) {
+  return emitCommand('cnc:connect', { source });
+}
+
+function disconnectCNC() {
+  return emitCommand('cnc:disconnect');
+}
+
+function jog(axis, direction, step) {
+  return emitCommand('cnc:jog', {
+    axis,
+    direction,
+    step,
+  });
+}
+
+function emergencyStop() {
+  return emitCommand('cnc:emergency');
+}
+
+function resetEmergency() {
+  return emitCommand('cnc:emergency:reset');
+}
+
+/*
+ * ============================================================
+ * SOCKET API
+ * ============================================================
+ */
+
+export { connectCNC, disconnectCNC, jog, emergencyStop, resetEmergency };
+
+export default socket;

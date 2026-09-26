@@ -1,0 +1,15 @@
+# Dependências e Logs
+node_modules/
+logs/
+*.log
+package-lock.json
+
+# Builds e temporários
+dist/
+build/
+coverage/
+.cache/
+
+# Git e VS Code
+.git/
+.vscode/

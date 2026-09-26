@@ -1,0 +1,33 @@
+services:
+  cnc_dashboard_app:
+    build:
+      context: .
+      target: development
+
+    container_name: cnc_dashboard_dev_container
+
+    ports:
+      - '${PORT:-3000}:${PORT:-3000}'
+
+    volumes:
+      - .:/src/app
+      - /src/app/node_modules
+
+    environment:
+      PORT: '${PORT:-3000}'
+      NODE_ENV: development
+      CNC_SERIAL_PORT: '${CNC_SERIAL_PORT:-/dev/ttyACM0}'
+      GRBL_STATUS_INTERVAL_MS: '${GRBL_STATUS_INTERVAL_MS:-250}'
+      GRBL_STATUS_TIMEOUT_MS: '${GRBL_STATUS_TIMEOUT_MS:-2000}'
+      GRBL_STARTUP_TIMEOUT_MS: '${GRBL_STARTUP_TIMEOUT_MS:-5000}'
+      CAMERA_STREAM_URL: '${CAMERA_STREAM_URL:-}'
+
+    group_add:
+      - '${DIALOUT_GID:-20}'
+
+    devices:
+      - '${CNC_SERIAL_PORT:-/dev/ttyACM0}:${CNC_SERIAL_PORT:-/dev/ttyACM0}'
+
+    command: npm run dev
+
+    restart: unless-stopped

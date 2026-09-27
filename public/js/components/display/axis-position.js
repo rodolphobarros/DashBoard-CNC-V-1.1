@@ -143,13 +143,21 @@ class CNCAxisPosition extends HTMLElement {
       this.updateJogControls();
     };
 
+    this.handleGcodeState = (event) => {
+      this.isGcodeLoaded = event.detail?.loaded !== false;
+
+      this.updateJogControls();
+    };
+
     window.addEventListener('cnc:state', this.handleState);
+    window.addEventListener('gcode:state', this.handleGcodeState);
 
     void this.loadGcodeStatus();
   }
 
   disconnectedCallback() {
     window.removeEventListener('cnc:state', this.handleState);
+    window.removeEventListener('gcode:state', this.handleGcodeState);
   }
 
   async loadGcodeStatus() {

@@ -1,14 +1,20 @@
 import express from 'express';
 
-const app = express();
-const PORT = process.env.PORT || 3000;
+import config from './config/config.js';
+import { app, httpServer } from './server/server.js';
 
 app.use(express.static('public'));
 
-app.get('/api/hello', (_req, res) => {
-  res.send('Olá, mundo!');
+app.get('/api/hello', (_request, response) => {
+  response.send('Olá, mundo!');
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor iniciado na porta ${PORT}`);
+app.get('/api/config', (_request, response) => {
+  response.json({
+    cameraStreamUrl: config.camera.streamUrl,
+  });
+});
+
+httpServer.listen(config.port, '0.0.0.0', () => {
+  console.log(`Server started on port ${config.port}`);
 });

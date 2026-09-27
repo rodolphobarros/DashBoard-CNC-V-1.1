@@ -124,3 +124,75 @@
 - [ ] Preparar o procedimento do primeiro teste
 
 ---
+
+# 1 — Desenvolvimento da base funcional
+
+## 1.1 Frontend do Dashboard
+
+- [x] Criar página principal e estrutura de cabeçalho, corpo e rodapé
+- [x] Criar sistema de Web Components e componentes base de UI
+- [x] Criar painel de posição dos eixos e controles de JOG
+- [x] Criar painel de monitorização térmica
+- [x] Criar painel de parada de emergência
+- [x] Criar painel de câmera e telemetria
+- [x] Criar painel de seleção e pré-visualização de G-code
+- [x] Criar seletor da fonte de conexão e exibir estado da conexão
+- [x] Sincronizar a interface com o estado da CNC e bloquear controles indisponíveis
+- [x] Criar layout responsivo inicial
+
+## 1.2 Backend e comunicação em tempo real
+
+- [x] Criar servidor Express e servir o frontend
+- [x] Integrar servidor HTTP com Socket.IO
+- [x] Criar rota de configuração do Dashboard
+- [x] Criar gerenciamento central do estado da CNC
+- [x] Criar roteador de eventos e comandos Socket.IO
+- [x] Implementar conexão e desconexão da fonte de dados
+- [ ] Receber e validar comandos enviados pelo frontend
+- [x] Sincronizar estado, conexão e capacidades com todos os clientes
+- [x] Tratar e comunicar erros de conexão e operação
+- [x] Restaurar o estado atual ao conectar ou atualizar o Dashboard
+
+## 1.3 Simulador CNC
+
+- [x] Criar estrutura e estado do simulador
+- [x] Implementar inicialização, conexão e desconexão
+- [x] Implementar ciclo de atualização em tempo real
+- [x] Simular posição e movimento dos eixos
+- [x] Implementar limites dos eixos simulados
+- [x] Implementar estados `IDLE`, `RUN`, `HOLD` e `ALARM`
+- [x] Implementar parada de emergência e reposição
+- [x] Registrar histórico básico de emergências
+- [x] Simular temperaturas e alarmes térmicos
+
+## 1.4 Máquina real e comunicação serial — Grbl 1.1h
+
+### 1.4.1 Estrutura e conexão serial
+
+- [x] Criar estrutura própria da máquina real
+- [x] Separar simulador e máquina real
+- [x] Detectar portas seriais `ttyACM` e `ttyUSB`
+- [x] Abrir porta serial em `115200 baud`
+- [x] Confirmar abertura da porta serial
+- [x] Fechar porta serial corretamente
+- [x] Configurar acesso à serial no Docker
+- [x] Configurar permissões do grupo `dialout`
+
+### 1.4.2 Comunicação com Grbl
+
+- [x] Ler respostas do Grbl terminadas por quebra de linha
+- [x] Identificar respostas `ok`, `error` e `ALARM`
+- [x] Solicitar e interpretar relatórios de estado com `?`
+- [x] Detectar a conexão com Grbl
+- [x] Detectar perda da comunicação serial
+- [x] Criar e atualizar o estado da máquina real
+- [x] Encaminhar o estado da máquina pelo Socket.IO
+
+### 1.4.3 Integração e validação
+
+- [ ] Mostrar conexão da máquina real no Dashboard
+- [ ] Atualizar o Dashboard após perda da conexão
+- [ ] Bloquear JOG real enquanto não estiver implementado
+- [ ] Bloquear emergência real enquanto não estiver implementada
+- [ ] Validar conexão e desconexão com o Arduino Uno R3
+- [ ] Registrar os resultados da validação serial

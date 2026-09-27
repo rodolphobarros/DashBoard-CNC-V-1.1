@@ -1,12 +1,3 @@
-/*
- * ============================================================
- * CNC MACHINE — FRONTEND SOCKET
- *
- * Purpose:
- *   Centralize all frontend Socket.IO communication.
- * ============================================================
- */
-
 const socket = io();
 
 function dispatchWindowEvent(name, detail) {
@@ -38,12 +29,6 @@ function createDisconnectedState() {
     },
   };
 }
-
-/*
- * ============================================================
- * SERVER CONNECTION
- * ============================================================
- */
 
 socket.on('connect', () => {
   console.log(`[Socket] Server connected: ${socket.id}`);
@@ -80,33 +65,15 @@ socket.on('connect_error', (error) => {
   });
 });
 
-/*
- * ============================================================
- * CNC STATE
- * ============================================================
- */
-
 socket.on('cnc:state', (state) => {
   dispatchWindowEvent('cnc:state', state);
 });
-
-/*
- * ============================================================
- * CNC CONNECTION ERROR
- * ============================================================
- */
 
 socket.on('cnc:connect-error', (error) => {
   console.error('[Socket] CNC connection error:', error);
 
   dispatchWindowEvent('cnc:connect-error', error);
 });
-
-/*
- * ============================================================
- * COMMAND RESULTS
- * ============================================================
- */
 
 socket.on('cnc:command-result', (result) => {
   if (result?.ok) {
@@ -118,21 +85,9 @@ socket.on('cnc:command-result', (result) => {
   dispatchWindowEvent('cnc:command-result', result);
 });
 
-/*
- * ============================================================
- * SERIAL DATA
- * ============================================================
- */
-
 socket.on('cnc:serial-data', (line) => {
   dispatchWindowEvent('cnc:serial-data', line);
 });
-
-/*
- * ============================================================
- * CNC COMMANDS
- * ============================================================
- */
 
 function emitCommand(eventName, payload) {
   if (!socket.connected) {
@@ -162,12 +117,16 @@ function disconnectCNC() {
   return emitCommand('cnc:disconnect');
 }
 
+function holdCNC() {
+  return emitCommand('cnc:hold');
+}
+
+function resumeCNC() {
+  return emitCommand('cnc:resume');
+}
+
 function jog(axis, direction, step) {
-  return emitCommand('cnc:jog', {
-    axis,
-    direction,
-    step,
-  });
+  return emitCommand('cnc:jog', { axis, direction, step });
 }
 
 function emergencyStop() {
@@ -178,12 +137,14 @@ function resetEmergency() {
   return emitCommand('cnc:emergency:reset');
 }
 
-/*
- * ============================================================
- * SOCKET API
- * ============================================================
- */
-
-export { connectCNC, disconnectCNC, jog, emergencyStop, resetEmergency };
+export {
+  connectCNC,
+  disconnectCNC,
+  holdCNC,
+  resumeCNC,
+  jog,
+  emergencyStop,
+  resetEmergency,
+};
 
 export default socket;

@@ -12,6 +12,10 @@ FROM node:24-bookworm-slim AS dependencies
 
 WORKDIR /src/app
 
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends udev \
+    && rm -rf /var/lib/apt/lists/*
+
 COPY --chown=node:node package*.json ./
 
 RUN npm ci
@@ -41,6 +45,10 @@ FROM node:24-bookworm-slim AS production
 ENV NODE_ENV=production
 
 WORKDIR /src/app
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends udev \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=node:node package*.json ./
 

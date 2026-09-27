@@ -95,6 +95,7 @@ class CNCEmergency extends HTMLElement {
       this.isEmergencyActive = false;
       this.emergencyButtonElement.disabled = true;
       this.emergencyButtonElement.textContent = 'Parada de Emergência';
+      this.emergencyButtonElement.classList.remove('is-active');
 
       this.emergencyStatusElement.textContent = isConnected
         ? 'Indisponível'
@@ -107,6 +108,11 @@ class CNCEmergency extends HTMLElement {
 
     this.isEmergencyActive = isEmergencyActive;
     this.emergencyButtonElement.disabled = false;
+
+    this.emergencyButtonElement.classList.toggle(
+      'is-active',
+      isEmergencyActive
+    );
 
     this.emergencyButtonElement.textContent = isEmergencyActive
       ? 'Repor Emergência'

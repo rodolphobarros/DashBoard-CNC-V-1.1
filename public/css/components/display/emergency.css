@@ -34,6 +34,14 @@
   background: var(--color-danger-hover);
 }
 
+.emergency-button.is-active {
+  background: #f5b700;
+}
+
+.emergency-button.is-active:hover {
+  background: #d9a200;
+}
+
 .emergency-warning {
   font-size: var(--fs-label);
   color: var(--color-text-dim);

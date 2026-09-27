@@ -373,16 +373,16 @@
 
 ## 3.2 Estado do programa G-code
 
-- [ ] Separar estado de arquivo carregado do estado de execução
-- [ ] Definir estado sem arquivo carregado
-- [ ] Definir estado de arquivo carregado e aguardando execução
-- [ ] Definir estado de programa em execução
-- [ ] Definir estado de programa concluído
+- [x] Separar estado de arquivo carregado do estado de execução
+- [x] Definir estado sem arquivo carregado
+- [x] Definir estado de arquivo carregado e aguardando execução
+- [x] Definir estado de programa em execução
+- [x] Definir estado de programa concluído
 - [ ] Manter o arquivo carregado após conclusão da execução
 - [ ] Liberar novamente a ação de iniciar após conclusão
 - [ ] Manter JOG bloqueado após conclusão enquanto houver arquivo carregado
-- [ ] Sincronizar o estado do programa com o Dashboard
-- [ ] Restaurar o estado de arquivo carregado após reiniciar o Dashboard
+- [x] Sincronizar o estado do programa com o Dashboard
+- [x] Restaurar o estado de arquivo carregado após reiniciar o Dashboard
 
 ## 3.3 Execução do G-code
 

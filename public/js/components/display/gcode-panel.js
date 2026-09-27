@@ -10,7 +10,7 @@ class CNCGcodePanel extends HTMLElement {
         <input id="gcodeFile" type="file" />
 
         <p class="gcode-panel__status" role="status">
-          Nenhum ficheiro selecionado.
+          Verificando programa carregado...
         </p>
 
         <pre
@@ -34,6 +34,12 @@ class CNCGcodePanel extends HTMLElement {
     this.uploadButtonElement = this.querySelector('.gcode-panel__upload');
     this.startButtonElement = this.querySelector('.gcode-panel__start');
 
+    this.gcodeState = {
+      loaded: false,
+      fileName: null,
+      executionState: 'NO_FILE',
+    };
+
     this.fileInputElement.addEventListener('change', () => {
       void this.showSelectedFile();
     });
@@ -42,19 +48,79 @@ class CNCGcodePanel extends HTMLElement {
       void this.uploadSelectedFile();
     });
 
-    this.setProgramState('unavailable');
+    this.handleGcodeState = (event) => {
+      this.updateGcodeState(event.detail);
+    };
+
+    window.addEventListener('gcode:state', this.handleGcodeState);
+
+    this.setProgramState('NO_FILE');
+
+    void this.loadGcodeState();
+  }
+
+  disconnectedCallback() {
+    window.removeEventListener('gcode:state', this.handleGcodeState);
+  }
+
+  async loadGcodeState() {
+    try {
+      const response = await fetch('/api/gcode/status');
+
+      if (!response.ok) {
+        throw new Error('Failed to load G-code state');
+      }
+
+      const state = await response.json();
+
+      this.updateGcodeState(state);
+    } catch (error) {
+      console.error('[GcodePanel] Failed to load G-code state:', error.message);
+
+      this.statusElement.textContent =
+        'Não foi possível verificar o programa carregado.';
+
+      this.setProgramState('NO_FILE');
+    }
+  }
+
+  updateGcodeState(state) {
+    this.gcodeState = state;
+
+    this.setProgramState(state.executionState);
+
+    if (state.executionState === 'NO_FILE') {
+      this.statusElement.textContent = 'Nenhum programa carregado.';
+      return;
+    }
+
+    if (state.executionState === 'READY') {
+      this.statusElement.textContent =
+        'Programa carregado e pronto para execução.';
+      return;
+    }
+
+    if (state.executionState === 'RUNNING') {
+      this.statusElement.textContent = 'Programa em execução.';
+      return;
+    }
+
+    if (state.executionState === 'COMPLETED') {
+      this.statusElement.textContent =
+        'Programa concluído. Programa permanece carregado.';
+    }
   }
 
   setProgramState(programState) {
     this.startButtonElement.classList.remove('gcode-panel__start--running');
 
-    if (programState === 'ready') {
+    if (programState === 'READY' || programState === 'COMPLETED') {
       this.startButtonElement.disabled = false;
       this.startButtonElement.textContent = 'Iniciar programa';
       return;
     }
 
-    if (programState === 'running') {
+    if (programState === 'RUNNING') {
       this.startButtonElement.disabled = true;
       this.startButtonElement.textContent = 'Programa em execução';
       this.startButtonElement.classList.add('gcode-panel__start--running');
@@ -88,13 +154,12 @@ class CNCGcodePanel extends HTMLElement {
         throw new Error('G-code upload failed');
       }
 
-      this.statusElement.textContent = `${selectedFile.name} enviado. Programa pronto para execução.`;
+      const state = await response.json();
 
-      this.setProgramState('ready');
+      this.updateGcodeState(state);
     } catch {
       this.statusElement.textContent = 'Não foi possível enviar o programa.';
       this.uploadButtonElement.disabled = false;
-      this.setProgramState('unavailable');
     }
   }
 
@@ -103,10 +168,9 @@ class CNCGcodePanel extends HTMLElement {
 
     this.previewElement.textContent = '';
     this.uploadButtonElement.disabled = true;
-    this.setProgramState('unavailable');
 
     if (!selectedFile) {
-      this.statusElement.textContent = 'Nenhum ficheiro selecionado.';
+      this.updateGcodeState(this.gcodeState);
       return;
     }
 

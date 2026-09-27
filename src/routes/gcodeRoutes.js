@@ -6,12 +6,9 @@ const router = Router();
 
 router.get('/status', async (_request, response, next) => {
   try {
-    const loaded = await gcodeService.hasActiveGcodeFile();
+    const state = await gcodeService.getState();
 
-    response.json({
-      loaded,
-      fileName: loaded ? 'execute.gcode' : null,
-    });
+    response.json(state);
   } catch (error) {
     next(error);
   }
@@ -19,13 +16,11 @@ router.get('/status', async (_request, response, next) => {
 
 router.post('/upload', expressRawGcode(), async (request, response, next) => {
   try {
-    const activeGcodeFile = await gcodeService.saveActiveGcodeFile(
-      request.body
-    );
+    const state = await gcodeService.saveActiveGcodeFile(request.body);
 
     response.json({
       success: true,
-      fileName: activeGcodeFile.fileName,
+      ...state,
     });
   } catch (error) {
     next(error);

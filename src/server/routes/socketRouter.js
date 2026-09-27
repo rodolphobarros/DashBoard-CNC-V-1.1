@@ -6,10 +6,18 @@ function registerSocketRouter(socketServer) {
     socketServer.emit('cnc:state', state);
   });
 
+  gcodeService.subscribe((state) => {
+    socketServer.emit('gcode:state', state);
+  });
+
   socketServer.on('connection', (socket) => {
     console.log(`[Socket] Client connected: ${socket.id}`);
 
     socket.emit('cnc:state', cncService.getState());
+
+    void gcodeService.getState().then((state) => {
+      socket.emit('gcode:state', state);
+    });
 
     socket.on('cnc:jog', async () => {
       try {

@@ -69,6 +69,10 @@ socket.on('cnc:state', (state) => {
   dispatchWindowEvent('cnc:state', state);
 });
 
+socket.on('gcode:state', (state) => {
+  dispatchWindowEvent('gcode:state', state);
+});
+
 socket.on('cnc:connect-error', (error) => {
   console.error('[Socket] CNC connection error:', error);
 

@@ -39,6 +39,26 @@ function registerSocketRouter(socketServer) {
       }
     });
 
+    socket.on('gcode:start', async () => {
+      try {
+        const state = await gcodeService.executeActiveGcode();
+
+        socket.emit('cnc:command-result', {
+          ok: true,
+          command: 'gcode:start',
+          state,
+        });
+      } catch (error) {
+        console.error('[Socket] G-code execution failed:', error.message);
+
+        socket.emit('cnc:command-result', {
+          ok: false,
+          command: 'gcode:start',
+          message: error.message,
+        });
+      }
+    });
+
     socket.on('cnc:connect', async ({ source }) => {
       try {
         const state = await cncService.connect(source);

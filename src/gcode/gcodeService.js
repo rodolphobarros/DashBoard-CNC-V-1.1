@@ -1,6 +1,8 @@
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import gcodeExecutor from './gcodeExecutor.js';
+
 const gcodeDirectoryPath = path.resolve('data/gcode');
 const activeGcodeFilePath = path.join(gcodeDirectoryPath, 'execute.gcode');
 
@@ -61,6 +63,33 @@ async function saveActiveGcodeFile(fileContent) {
   return state;
 }
 
+async function executeActiveGcode() {
+  const loaded = await hasActiveGcodeFile();
+
+  if (!loaded) {
+    executionState = executionStates.NO_FILE;
+    throw new Error('No G-code program loaded');
+  }
+
+  if (executionState === executionStates.RUNNING) {
+    throw new Error('G-code program is already running');
+  }
+
+  await markRunning();
+
+  try {
+    await gcodeExecutor.execute();
+    return await markCompleted();
+  } catch (error) {
+    executionState = executionStates.READY;
+
+    const state = await getState();
+    notifyStateChange(state);
+
+    throw error;
+  }
+}
+
 async function markRunning() {
   const loaded = await hasActiveGcodeFile();
 
@@ -119,6 +148,7 @@ const gcodeService = {
   getState,
   hasActiveGcodeFile,
   saveActiveGcodeFile,
+  executeActiveGcode,
   markRunning,
   markCompleted,
   subscribe,

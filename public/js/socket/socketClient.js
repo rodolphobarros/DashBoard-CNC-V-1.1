@@ -133,6 +133,10 @@ function jog(axis, direction, step) {
   return emitCommand('cnc:jog', { axis, direction, step });
 }
 
+function startGcode() {
+  return emitCommand('gcode:start');
+}
+
 function emergencyStop() {
   return emitCommand('cnc:emergency');
 }
@@ -147,6 +151,7 @@ export {
   holdCNC,
   resumeCNC,
   jog,
+  startGcode,
   emergencyStop,
   resetEmergency,
 };

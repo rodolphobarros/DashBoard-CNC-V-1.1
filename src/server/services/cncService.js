@@ -30,7 +30,6 @@ class CNCService {
         }
 
         const state = updateState(simulatorData);
-
         this.notifyStateChange(state);
       });
 
@@ -40,7 +39,6 @@ class CNCService {
       });
 
       this.notifyStateChange(state);
-
       return state;
     }
 
@@ -50,25 +48,19 @@ class CNCService {
       }
 
       const state = updateState(machineData);
-
       this.notifyStateChange(state);
     });
 
     try {
       const machineData = await cncMachine.open();
-
       const state = updateState(machineData);
-
       this.notifyStateChange(state);
-
       return state;
     } catch (error) {
       this.unsubscribeMachine();
-
       this.activeSource = null;
 
       const state = resetState();
-
       this.notifyStateChange(state);
 
       throw error;
@@ -77,7 +69,6 @@ class CNCService {
 
   async disconnect() {
     const source = this.activeSource;
-
     this.activeSource = null;
 
     if (source === 'SIMULATOR') {
@@ -100,10 +91,25 @@ class CNCService {
     }
 
     const state = resetState();
-
     this.notifyStateChange(state);
 
     return state;
+  }
+
+  async sendGcodeLine(line) {
+    if (this.activeSource !== 'MACHINE') {
+      throw new Error('No CNC machine connected');
+    }
+
+    return cncMachine.sendGcodeLine(line);
+  }
+
+  async waitUntilIdle() {
+    if (this.activeSource !== 'MACHINE') {
+      throw new Error('No CNC machine connected');
+    }
+
+    return cncMachine.waitUntilIdle();
   }
 
   hold() {

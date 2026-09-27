@@ -1,3 +1,5 @@
+import { startGcode } from '../../socket/socketClient.js';
+
 class CNCGcodePanel extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -48,11 +50,20 @@ class CNCGcodePanel extends HTMLElement {
       void this.uploadSelectedFile();
     });
 
+    this.startButtonElement.addEventListener('click', () => {
+      this.startProgram();
+    });
+
     this.handleGcodeState = (event) => {
       this.updateGcodeState(event.detail);
     };
 
+    this.handleCommandResult = (event) => {
+      this.handleStartResult(event.detail);
+    };
+
     window.addEventListener('gcode:state', this.handleGcodeState);
+    window.addEventListener('cnc:command-result', this.handleCommandResult);
 
     this.setProgramState('NO_FILE');
 
@@ -61,6 +72,7 @@ class CNCGcodePanel extends HTMLElement {
 
   disconnectedCallback() {
     window.removeEventListener('gcode:state', this.handleGcodeState);
+    window.removeEventListener('cnc:command-result', this.handleCommandResult);
   }
 
   async loadGcodeState() {
@@ -129,6 +141,39 @@ class CNCGcodePanel extends HTMLElement {
 
     this.startButtonElement.disabled = true;
     this.startButtonElement.textContent = 'Iniciar programa — indisponível';
+  }
+
+  startProgram() {
+    if (
+      this.gcodeState.executionState !== 'READY' &&
+      this.gcodeState.executionState !== 'COMPLETED'
+    ) {
+      return;
+    }
+
+    this.startButtonElement.disabled = true;
+    this.statusElement.textContent = 'Solicitando início do programa...';
+
+    const emitted = startGcode();
+
+    if (!emitted) {
+      this.setProgramState(this.gcodeState.executionState);
+    }
+  }
+
+  handleStartResult(result) {
+    if (result?.command !== 'gcode:start') {
+      return;
+    }
+
+    if (result.ok) {
+      return;
+    }
+
+    this.statusElement.textContent =
+      result.message || 'Não foi possível iniciar o programa.';
+
+    this.setProgramState(this.gcodeState.executionState);
   }
 
   async uploadSelectedFile() {

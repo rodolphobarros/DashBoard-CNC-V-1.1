@@ -22,6 +22,9 @@ class CNCMachine {
     this.alarms = [];
 
     this.stateListeners = new Set();
+
+    this.pendingCommand = null;
+    this.idleWaiter = null;
   }
 
   async open(serialPath = config.cnc.serialPort) {
@@ -75,6 +78,9 @@ class CNCMachine {
   }
 
   async close() {
+    this.rejectPendingCommand(new Error('CNC machine connection closed'));
+    this.rejectIdleWaiter(new Error('CNC machine connection closed'));
+
     this.stopTimers();
 
     try {
@@ -98,10 +104,14 @@ class CNCMachine {
     switch (response.type) {
       case 'OK':
         console.log('[Machine] Grbl response: OK');
+        this.resolvePendingCommand();
         break;
 
       case 'ERROR':
         console.error(`[Machine] Grbl error: ${response.code}`);
+        this.rejectPendingCommand(
+          new Error(`Grbl rejected command with error ${response.code}`)
+        );
         break;
 
       case 'ALARM':
@@ -117,6 +127,13 @@ class CNCMachine {
           },
         ];
 
+        this.rejectPendingCommand(
+          new Error(`Grbl entered alarm state: ${response.code}`)
+        );
+        this.rejectIdleWaiter(
+          new Error(`Grbl entered alarm state: ${response.code}`)
+        );
+
         console.error(`[Machine] Grbl alarm: ${response.code}`);
 
         this.notifyStateChange();
@@ -127,6 +144,7 @@ class CNCMachine {
         this.resetStatusTimeout();
 
         this.updateStatus(response);
+        this.resolveIdleWaiterIfReady();
         this.notifyStateChange();
         break;
 
@@ -171,6 +189,146 @@ class CNCMachine {
     console.log('[Machine] Grbl connection confirmed');
 
     this.notifyStateChange();
+  }
+
+  async sendGcodeLine(line) {
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    if (this.pendingCommand) {
+      throw new Error('Another Grbl command is awaiting response');
+    }
+
+    const command = line.trim();
+
+    if (!command) {
+      return;
+    }
+
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        if (!this.pendingCommand) {
+          return;
+        }
+
+        this.pendingCommand = null;
+
+        reject(
+          new Error(
+            `Grbl did not acknowledge command within ${config.grbl.commandTimeoutMs} ms`
+          )
+        );
+      }, config.grbl.commandTimeoutMs);
+
+      this.pendingCommand = {
+        resolve,
+        reject,
+        timeoutId,
+      };
+
+      try {
+        this.serialConnection.write(`${command}\n`);
+      } catch (error) {
+        clearTimeout(timeoutId);
+        this.pendingCommand = null;
+        reject(error);
+      }
+    });
+  }
+
+  resolvePendingCommand() {
+    if (!this.pendingCommand) {
+      return;
+    }
+
+    const { resolve, timeoutId } = this.pendingCommand;
+
+    this.pendingCommand = null;
+
+    clearTimeout(timeoutId);
+    resolve();
+  }
+
+  rejectPendingCommand(error) {
+    if (!this.pendingCommand) {
+      return;
+    }
+
+    const { reject, timeoutId } = this.pendingCommand;
+
+    this.pendingCommand = null;
+
+    clearTimeout(timeoutId);
+    reject(error);
+  }
+
+  async waitUntilIdle() {
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    if (this.idleWaiter) {
+      throw new Error('Already waiting for Grbl idle state');
+    }
+
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => {
+        if (!this.idleWaiter) {
+          return;
+        }
+
+        this.idleWaiter = null;
+
+        reject(
+          new Error(
+            `Grbl did not become idle within ${config.grbl.idleTimeoutMs} ms`
+          )
+        );
+      }, config.grbl.idleTimeoutMs);
+
+      this.idleWaiter = {
+        resolve,
+        reject,
+        timeoutId,
+      };
+
+      this.requestStatus();
+    });
+  }
+
+  resolveIdleWaiterIfReady() {
+    if (!this.idleWaiter || this.status !== 'IDLE') {
+      return;
+    }
+
+    const { resolve, timeoutId } = this.idleWaiter;
+
+    this.idleWaiter = null;
+
+    clearTimeout(timeoutId);
+    resolve();
+  }
+
+  rejectIdleWaiter(error) {
+    if (!this.idleWaiter) {
+      return;
+    }
+
+    const { reject, timeoutId } = this.idleWaiter;
+
+    this.idleWaiter = null;
+
+    clearTimeout(timeoutId);
+    reject(error);
   }
 
   requestStatus() {
@@ -267,6 +425,8 @@ class CNCMachine {
       return;
     }
 
+    this.rejectPendingCommand(error);
+    this.rejectIdleWaiter(error);
     this.stopTimers();
 
     this.connection = 'DISCONNECTED';

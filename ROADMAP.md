@@ -190,9 +190,162 @@
 
 ### 1.4.3 Integração e validação
 
-- [ ] Mostrar conexão da máquina real no Dashboard
-- [ ] Atualizar o Dashboard após perda da conexão
-- [ ] Bloquear JOG real enquanto não estiver implementado
-- [ ] Bloquear emergência real enquanto não estiver implementada
-- [ ] Validar conexão e desconexão com o Arduino Uno R3
-- [ ] Registrar os resultados da validação serial
+- [x] Mostrar conexão da máquina real no Dashboard
+- [x] Atualizar o Dashboard após perda da conexão
+- [x] Bloquear JOG real enquanto não estiver implementado
+- [x] Bloquear emergência real enquanto não estiver implementada
+- [x] Validar conexão e desconexão com o Arduino Uno R3
+- [x] Registrar os resultados da validação serial
+
+## 1.5 Câmera e Raspberry Pi
+
+- [x] Preparar Raspberry Pi 5 com Debian 13
+- [x] Detectar e configurar a câmera USB em `/dev/video0`
+- [x] Validar captura MJPEG em `1280x720` a 30 FPS
+- [x] Instalar e configurar o µStreamer
+- [x] Transmitir o stream MJPEG pela rede local
+- [x] Integrar e validar o stream da câmera no Dashboard
+- [x] Configurar o µStreamer como serviço `systemd` com inicialização automática
+- [x] Instalar e configurar Docker e Docker Compose no Raspberry Pi
+- [x] Configurar SSH, clonar o projeto e construir a imagem ARM64
+- [x] Executar e validar o Dashboard pela rede em computadores e celular
+
+## 1.6 Configuração do Grbl no Arduino Uno Rev3
+
+### 1.6.1 Definição da arquitetura
+
+- [x] Definir o Arduino Uno Rev3 como controlador da CNC
+- [x] Definir o Grbl como firmware de controle
+- [x] Definir G-code como linguagem de movimento
+- [x] Manter Socket.IO entre frontend e backend
+- [x] Utilizar o protocolo textual Grbl entre backend e Arduino
+- [x] Configurar comunicação serial em `115200 baud`
+- [x] Registrar a versão utilizada: `Grbl 1.1h`
+- [x] Registrar a origem oficial do firmware
+- [x] Separar comunicação serial, interpretação do protocolo e estado da máquina
+- [x] Validar a arquitetura com o Arduino Uno Rev3 real
+
+### 1.6.2 Instalação do GRBL
+
+- [x] Instalar o GRBL na Arduino IDE
+- [x] Abrir o exemplo `grblUpload`
+- [x] Selecionar a placa `Arduino Uno`
+- [x] Selecionar a porta serial do Uno Rev3
+- [x] Compilar o firmware
+- [x] Gravar o GRBL no Uno Rev3
+- [x] Confirmar a gravação sem erros
+- [x] Confirmar a mensagem de inicialização do GRBL
+
+### 1.6.3 Validação da comunicação
+
+- [x] Abrir a comunicação serial em `115200 baud`
+- [x] Executar o comando `$I`
+- [x] Executar o comando `$$`
+- [x] Executar a consulta de estado `?`
+- [x] Confirmar a resposta do GRBL
+- [x] Salvar a configuração original
+- [x] Confirmar que nenhum motor foi movimentado nesta etapa
+
+### 1.6.4 Preparação da integração
+
+- [x] Identificar respostas `ok`
+- [x] Identificar respostas `error:n`
+- [x] Identificar respostas `ALARM:n`
+- [x] Identificar relatórios de estado `<...>`
+- [x] Definir consulta periódica de estado com `?`
+- [x] Definir timeout de resposta do Grbl
+- [ ] Documentar os comandos Grbl utilizados pelo Dashboard
+
+---
+
+# 2 — Ambiente de execução no Raspberry Pi
+
+## 2.1 Base do Raspberry Pi
+
+- [x] Utilizar Raspberry Pi 5 como computador principal da CNC
+- [x] Instalar Debian 13
+- [x] Configurar acesso à rede local
+- [x] Configurar acesso remoto por SSH
+- [x] Instalar Git
+- [x] Configurar acesso SSH ao repositório do projeto
+- [x] Clonar o repositório no Raspberry Pi
+- [x] Instalar Docker
+- [x] Instalar Docker Compose
+- [x] Configurar o usuário para executar Docker
+
+## 2.2 Dispositivos da máquina
+
+- [x] Detectar o Arduino Uno Rev3 pela interface USB
+- [x] Identificar a porta serial `/dev/ttyACM0`
+- [x] Configurar acesso ao grupo `dialout`
+- [x] Disponibilizar a porta serial para o container Docker
+- [x] Validar comunicação serial com Grbl em `115200 baud`
+- [x] Detectar a câmera USB em `/dev/video0`
+- [x] Validar captura MJPEG da câmera
+- [x] Disponibilizar o stream da câmera pela rede
+- [x] Validar acesso ao stream pelo Dashboard
+- [ ] Validar dispositivos após reinicialização completa do Raspberry Pi
+
+## 2.3 Configuração por variáveis de ambiente
+
+- [x] Definir `PORT`
+- [x] Definir `CNC_SERIAL_PORT`
+- [x] Definir `CAMERA_STREAM_URL`
+- [x] Definir `GRBL_STATUS_INTERVAL_MS`
+- [x] Definir `GRBL_STATUS_TIMEOUT_MS`
+- [x] Definir `GRBL_STARTUP_TIMEOUT_MS`
+- [x] Utilizar valores padrão seguros na configuração da aplicação
+- [x] Encaminhar as variáveis para o container Docker
+- [ ] Documentar as variáveis de ambiente disponíveis
+- [ ] Criar configuração de ambiente específica para produção
+
+## 2.4 Docker de desenvolvimento e produção
+
+- [x] Criar imagem Docker para desenvolvimento
+- [x] Criar imagem Docker para produção
+- [x] Utilizar build multi-stage
+- [x] Instalar somente dependências necessárias na imagem de produção
+- [x] Executar a aplicação com usuário não privilegiado
+- [x] Configurar acesso à porta serial no Docker Compose
+- [x] Configurar acesso ao grupo `dialout` no container
+- [x] Construir a imagem para arquitetura ARM64
+- [x] Executar o Dashboard em container no Raspberry Pi
+- [ ] Validar explicitamente a imagem de produção no Raspberry Pi
+
+## 2.5 Inicialização automática
+
+- [x] Criar serviço `systemd` para o µStreamer
+- [x] Habilitar inicialização automática da câmera
+- [x] Validar o µStreamer após inicialização
+- [ ] Definir estratégia de inicialização automática do Dashboard
+- [ ] Configurar inicialização automática dos containers
+- [ ] Garantir reinicialização do Dashboard após falha
+- [ ] Garantir disponibilidade da serial após inicialização
+- [ ] Garantir disponibilidade da câmera após inicialização
+- [ ] Validar ordem de inicialização dos serviços
+- [ ] Validar funcionamento completo após reiniciar o Raspberry Pi
+
+## 2.6 Fluxo de atualização
+
+- [x] Configurar acesso do Raspberry Pi ao repositório Git
+- [ ] Definir procedimento para atualizar o código com Git
+- [ ] Definir procedimento para reconstruir a imagem Docker
+- [ ] Definir procedimento para recriar os containers
+- [ ] Preservar configurações locais durante atualizações
+- [ ] Definir procedimento de rollback
+- [ ] Registrar a versão implantada no Raspberry Pi
+- [ ] Validar atualização sem reinstalação manual do ambiente
+- [ ] Documentar o fluxo completo de atualização
+
+## 2.7 Verificação no Raspberry Pi
+
+- [ ] Validar inicialização completa após reboot
+- [ ] Confirmar container do Dashboard em execução
+- [ ] Confirmar serviço da câmera em execução
+- [ ] Confirmar detecção do Arduino Uno Rev3
+- [ ] Confirmar comunicação com Grbl
+- [ ] Confirmar acesso ao stream MJPEG
+- [ ] Confirmar acesso ao Dashboard pela rede local
+- [ ] Confirmar conexão da máquina real pelo Dashboard
+- [ ] Confirmar atualização do Dashboard após perda da serial
+- [ ] Executar validação final sem movimentar motores

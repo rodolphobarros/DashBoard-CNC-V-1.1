@@ -360,16 +360,16 @@
 
 ## 3.1 Recebimento e gerenciamento do G-code
 
-- [ ] Criar diretório persistente `data/gcode` no Raspberry Pi
-- [ ] Disponibilizar o diretório de G-code ao container de produção
+- [x] Criar diretório persistente `data/gcode` no Raspberry Pi
+- [x] Disponibilizar o diretório de G-code ao container de produção
 - [x] Implementar envio de arquivo do Dashboard para o backend
 - [x] Salvar qualquer arquivo recebido como `execute.gcode`
 - [x] Sobrescrever `execute.gcode` ao receber um novo arquivo
-- [ ] Manter `execute.gcode` persistente após reinicializações
-- [ ] Identificar no backend se existe um G-code carregado
-- [ ] Bloquear JOG enquanto existir um G-code carregado
+- [x] Manter `execute.gcode` persistente após reinicializações
+- [x] Identificar no backend se existe um G-code carregado
+- [x] Bloquear JOG enquanto existir um G-code carregado
 - [x] Permitir substituir o G-code carregado por um novo arquivo
-- [ ] Permitir reutilizar o mesmo `execute.gcode` em múltiplas execuções
+- [ ] Permitir reutilizar o mesmo `execute.gcode` em múltiplas execuções — `só se der tempo`
 
 ## 3.2 Estado do programa G-code
 

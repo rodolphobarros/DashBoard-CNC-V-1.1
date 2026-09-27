@@ -1,20 +1,31 @@
 import { Router } from 'express';
-import { mkdir, writeFile } from 'node:fs/promises';
-import path from 'node:path';
+
+import gcodeService from '../gcode/gcodeService.js';
 
 const router = Router();
 
-const gcodeDirectoryPath = path.resolve('data/gcode');
-const activeGcodeFilePath = path.join(gcodeDirectoryPath, 'execute.gcode');
+router.get('/status', async (_request, response, next) => {
+  try {
+    const loaded = await gcodeService.hasActiveGcodeFile();
+
+    response.json({
+      loaded,
+      fileName: loaded ? 'execute.gcode' : null,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
 
 router.post('/upload', expressRawGcode(), async (request, response, next) => {
   try {
-    await mkdir(gcodeDirectoryPath, { recursive: true });
-    await writeFile(activeGcodeFilePath, request.body);
+    const activeGcodeFile = await gcodeService.saveActiveGcodeFile(
+      request.body
+    );
 
     response.json({
       success: true,
-      fileName: 'execute.gcode',
+      fileName: activeGcodeFile.fileName,
     });
   } catch (error) {
     next(error);

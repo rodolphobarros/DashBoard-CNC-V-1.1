@@ -1,3 +1,4 @@
+import gcodeService from '../../gcode/gcodeService.js';
 import cncService from '../services/cncService.js';
 
 function registerSocketRouter(socketServer) {
@@ -10,23 +11,37 @@ function registerSocketRouter(socketServer) {
 
     socket.emit('cnc:state', cncService.getState());
 
-    socket.on('cnc:connect', async ({ source } = {}) => {
+    socket.on('cnc:jog', async () => {
       try {
-        console.log(`[Socket] CNC connection requested: ${source}`);
+        const isGcodeLoaded = await gcodeService.hasActiveGcodeFile();
 
-        await cncService.connect(source);
+        if (isGcodeLoaded) {
+          throw new Error('JOG blocked while a G-code program is loaded');
+        }
+
+        throw new Error('JOG is not available yet');
+      } catch (error) {
+        console.error('[Socket] CNC jog rejected:', error.message);
+
+        socket.emit('cnc:command-result', {
+          ok: false,
+          command: 'cnc:jog',
+          message: error.message,
+        });
+      }
+    });
+
+    socket.on('cnc:connect', async ({ source }) => {
+      try {
+        const state = await cncService.connect(source);
 
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:connect',
-          message: `Connected to ${source}`,
+          state,
         });
       } catch (error) {
-        console.error('[Socket] CNC connection failed:', error.message);
-
-        socket.emit('cnc:connect-error', {
-          message: error.message,
-        });
+        console.error('[Socket] CNC connect failed:', error.message);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -38,17 +53,15 @@ function registerSocketRouter(socketServer) {
 
     socket.on('cnc:disconnect', async () => {
       try {
-        console.log('[Socket] CNC disconnection requested');
-
-        await cncService.disconnect();
+        const state = await cncService.disconnect();
 
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:disconnect',
-          message: 'CNC disconnected',
+          state,
         });
       } catch (error) {
-        console.error('[Socket] CNC disconnection failed:', error.message);
+        console.error('[Socket] CNC disconnect failed:', error.message);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -60,14 +73,12 @@ function registerSocketRouter(socketServer) {
 
     socket.on('cnc:hold', () => {
       try {
-        console.log('[Socket] CNC hold requested');
-
-        cncService.hold();
+        const state = cncService.hold();
 
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:hold',
-          message: 'CNC paused',
+          state,
         });
       } catch (error) {
         console.error('[Socket] CNC hold failed:', error.message);
@@ -82,14 +93,12 @@ function registerSocketRouter(socketServer) {
 
     socket.on('cnc:resume', () => {
       try {
-        console.log('[Socket] CNC resume requested');
-
-        cncService.resume();
+        const state = cncService.resume();
 
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:resume',
-          message: 'CNC resumed',
+          state,
         });
       } catch (error) {
         console.error('[Socket] CNC resume failed:', error.message);
@@ -104,17 +113,15 @@ function registerSocketRouter(socketServer) {
 
     socket.on('cnc:emergency', () => {
       try {
-        console.log('[Socket] Emergency stop requested');
-
-        cncService.emergencyStop();
+        const state = cncService.emergencyStop();
 
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:emergency',
-          message: 'Emergency stop activated',
+          state,
         });
       } catch (error) {
-        console.error('[Socket] Emergency stop failed:', error.message);
+        console.error('[Socket] CNC emergency failed:', error.message);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -126,17 +133,15 @@ function registerSocketRouter(socketServer) {
 
     socket.on('cnc:emergency:reset', () => {
       try {
-        console.log('[Socket] Emergency reset requested');
-
-        cncService.resetEmergency();
+        const state = cncService.resetEmergency();
 
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:emergency:reset',
-          message: 'Emergency reset completed',
+          state,
         });
       } catch (error) {
-        console.error('[Socket] Emergency reset failed:', error.message);
+        console.error('[Socket] CNC emergency reset failed:', error.message);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -146,8 +151,8 @@ function registerSocketRouter(socketServer) {
       }
     });
 
-    socket.on('disconnect', (reason) => {
-      console.log(`[Socket] Client disconnected: ${socket.id} (${reason})`);
+    socket.on('disconnect', () => {
+      console.log(`[Socket] Client disconnected: ${socket.id}`);
     });
   });
 }

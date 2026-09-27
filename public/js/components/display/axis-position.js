@@ -105,6 +105,8 @@ class CNCAxisPosition extends HTMLElement {
     this.jogButtons = [...this.querySelectorAll('.jog-button')];
 
     this.canJog = false;
+    this.isGcodeLoaded = true;
+    this.currentState = null;
 
     this.stepSelector.disabled = true;
 
@@ -135,15 +137,42 @@ class CNCAxisPosition extends HTMLElement {
     });
 
     this.handleState = (event) => {
-      this.updatePosition(event.detail);
-      this.updateJogControls(event.detail);
+      this.currentState = event.detail;
+
+      this.updatePosition(this.currentState);
+      this.updateJogControls();
     };
 
     window.addEventListener('cnc:state', this.handleState);
+
+    void this.loadGcodeStatus();
   }
 
   disconnectedCallback() {
     window.removeEventListener('cnc:state', this.handleState);
+  }
+
+  async loadGcodeStatus() {
+    try {
+      const response = await fetch('/api/gcode/status');
+
+      if (!response.ok) {
+        throw new Error('Failed to load G-code status');
+      }
+
+      const gcodeStatus = await response.json();
+
+      this.isGcodeLoaded = gcodeStatus.loaded === true;
+    } catch (error) {
+      console.error(
+        '[AxisPosition] Failed to load G-code status:',
+        error.message
+      );
+
+      this.isGcodeLoaded = true;
+    }
+
+    this.updateJogControls();
   }
 
   updatePosition(state) {
@@ -167,7 +196,9 @@ class CNCAxisPosition extends HTMLElement {
     this.positionZ.textContent = state.position.z.toFixed(1);
   }
 
-  updateJogControls(state) {
+  updateJogControls() {
+    const state = this.currentState;
+
     const isConnected = state?.connection === 'CONNECTED';
     const isJogSupported = state?.capabilities?.jog === true;
     const isEmergencyActive = state?.emergency === true;
@@ -176,7 +207,11 @@ class CNCAxisPosition extends HTMLElement {
       state?.status === 'HOLD' || state?.status === 'ALARM';
 
     this.canJog =
-      isConnected && isJogSupported && !isEmergencyActive && !isBlockedStatus;
+      isConnected &&
+      isJogSupported &&
+      !isEmergencyActive &&
+      !isBlockedStatus &&
+      !this.isGcodeLoaded;
 
     this.stepSelector.disabled = !this.canJog;
 

@@ -310,18 +310,18 @@
 - [x] Configurar acesso ao grupo `dialout` no container
 - [x] Construir a imagem para arquitetura ARM64
 - [x] Executar o Dashboard em container no Raspberry Pi
-- [ ] Validar explicitamente a imagem de produção no Raspberry Pi
+- [x] Validar explicitamente a imagem de produção no Raspberry Pi
 
 ## 2.5 Inicialização automática
 
 - [x] Criar serviço `systemd` para o µStreamer
 - [x] Habilitar inicialização automática da câmera
 - [x] Validar o µStreamer após inicialização
-- [ ] Definir estratégia de inicialização automática do Dashboard
-- [ ] Configurar inicialização automática dos containers
-- [ ] Garantir reinicialização do Dashboard após falha
-- [ ] Garantir disponibilidade da serial após inicialização
-- [ ] Garantir disponibilidade da câmera após inicialização
+- [x] Definir estratégia de inicialização automática do Dashboard
+- [x] Configurar inicialização automática dos containers
+- [x] Garantir reinicialização do Dashboard após falha
+- [x] Garantir disponibilidade da serial após inicialização
+- [x] Garantir disponibilidade da câmera após inicialização
 - [ ] Validar ordem de inicialização dos serviços
 - [ ] Validar funcionamento completo após reiniciar o Raspberry Pi
 

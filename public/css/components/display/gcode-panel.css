@@ -26,9 +26,26 @@
 
 .gcode-panel__start {
   padding: 0.375rem 0.5rem;
+
+  color: #ffffff;
+  background: #2e7d32;
+  border: 1px solid #2e7d32;
+
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .gcode-panel__start:disabled {
   cursor: not-allowed;
   opacity: 0.55;
+}
+
+.gcode-panel__start--running,
+.gcode-panel__start--running:disabled {
+  color: #1b5e20;
+  background: #a5d6a7;
+  border-color: #81c784;
+  opacity: 1;
 }

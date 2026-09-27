@@ -149,3 +149,6 @@ vite.config.ts.timestamp-*
 
 # Roadmap privado do simulador
 ROADMAP.simulador.md
+
+# Pasta do g-code
+data/gcode/execute.gcode

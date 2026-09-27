@@ -284,7 +284,7 @@
 - [x] Validar captura MJPEG da câmera
 - [x] Disponibilizar o stream da câmera pela rede
 - [x] Validar acesso ao stream pelo Dashboard
-- [ ] Validar dispositivos após reinicialização completa do Raspberry Pi
+- [x] Validar dispositivos após reinicialização completa do Raspberry Pi
 
 ## 2.3 Configuração por variáveis de ambiente
 
@@ -322,8 +322,8 @@
 - [x] Garantir reinicialização do Dashboard após falha
 - [x] Garantir disponibilidade da serial após inicialização
 - [x] Garantir disponibilidade da câmera após inicialização
-- [ ] Validar ordem de inicialização dos serviços
-- [ ] Validar funcionamento completo após reiniciar o Raspberry Pi
+- [x] Validar ordem de inicialização dos serviços
+- [x] Validar funcionamento completo após reiniciar o Raspberry Pi
 
 ## 2.6 Fluxo de atualização
 
@@ -339,13 +339,60 @@
 
 ## 2.7 Verificação no Raspberry Pi
 
-- [ ] Validar inicialização completa após reboot
-- [ ] Confirmar container do Dashboard em execução
-- [ ] Confirmar serviço da câmera em execução
-- [ ] Confirmar detecção do Arduino Uno Rev3
-- [ ] Confirmar comunicação com Grbl
-- [ ] Confirmar acesso ao stream MJPEG
-- [ ] Confirmar acesso ao Dashboard pela rede local
-- [ ] Confirmar conexão da máquina real pelo Dashboard
-- [ ] Confirmar atualização do Dashboard após perda da serial
+- [x] Validar inicialização completa após reboot
+- [x] Confirmar container do Dashboard em execução
+- [x] Confirmar serviço da câmera em execução
+- [x] Confirmar detecção do Arduino Uno Rev3
+- [x] Confirmar comunicação com Grbl
+- [x] Confirmar acesso ao stream MJPEG
+- [x] Confirmar acesso ao Dashboard pela rede local
+- [x] Confirmar conexão da máquina real pelo Dashboard
+- [x] Confirmar atualização do Dashboard após perda da serial
 - [ ] Executar validação final sem movimentar motores
+
+---
+
+# 3 — Controle e execução da CNC
+
+## 3.0 Adequação do frontend
+
+- [x] Adaptar o frontend ao fluxo de arquivo G-code e execução
+
+## 3.1 Recebimento e gerenciamento do G-code
+
+- [ ] Criar diretório persistente `data/gcode` no Raspberry Pi
+- [ ] Disponibilizar o diretório de G-code ao container de produção
+- [x] Implementar envio de arquivo do Dashboard para o backend
+- [x] Salvar qualquer arquivo recebido como `execute.gcode`
+- [x] Sobrescrever `execute.gcode` ao receber um novo arquivo
+- [ ] Manter `execute.gcode` persistente após reinicializações
+- [ ] Identificar no backend se existe um G-code carregado
+- [ ] Bloquear JOG enquanto existir um G-code carregado
+- [x] Permitir substituir o G-code carregado por um novo arquivo
+- [ ] Permitir reutilizar o mesmo `execute.gcode` em múltiplas execuções
+
+## 3.2 Estado do programa G-code
+
+- [ ] Separar estado de arquivo carregado do estado de execução
+- [ ] Definir estado sem arquivo carregado
+- [ ] Definir estado de arquivo carregado e aguardando execução
+- [ ] Definir estado de programa em execução
+- [ ] Definir estado de programa concluído
+- [ ] Manter o arquivo carregado após conclusão da execução
+- [ ] Liberar novamente a ação de iniciar após conclusão
+- [ ] Manter JOG bloqueado após conclusão enquanto houver arquivo carregado
+- [ ] Sincronizar o estado do programa com o Dashboard
+- [ ] Restaurar o estado de arquivo carregado após reiniciar o Dashboard
+
+## 3.3 Execução do G-code
+
+- [ ] Implementar ação para iniciar o G-code carregado
+- [ ] Ler `execute.gcode` para execução
+- [ ] Preparar as linhas do arquivo para envio
+- [ ] Enviar comandos G-code ao Grbl pela comunicação serial
+- [ ] Controlar o avanço das linhas durante a execução
+- [ ] Impedir nova execução enquanto o programa estiver executando
+- [ ] Atualizar o progresso da execução no Dashboard
+- [ ] Detectar o fim do programa
+- [ ] Retornar o programa ao estado disponível para nova execução
+- [ ] Validar execuções consecutivas do mesmo `execute.gcode`

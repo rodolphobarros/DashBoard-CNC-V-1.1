@@ -1,9 +1,12 @@
 import express from 'express';
 
 import config from './config/config.js';
+import gcodeRoutes from './routes/gcodeRoutes.js';
 import { app, httpServer } from './server/server.js';
 
 app.use(express.static('public'));
+
+app.use('/api/gcode', gcodeRoutes);
 
 app.get('/api/hello', (_request, response) => {
   response.send('Olá, mundo!');

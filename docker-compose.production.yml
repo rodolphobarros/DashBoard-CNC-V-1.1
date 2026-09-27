@@ -9,6 +9,9 @@ services:
     ports:
       - '${PORT:-3000}:${PORT:-3000}'
 
+    volumes:
+      - ./data/gcode:/src/app/data/gcode
+
     environment:
       PORT: '${PORT:-3000}'
       NODE_ENV: production

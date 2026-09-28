@@ -112,6 +112,14 @@ class CNCService {
     return cncMachine.waitUntilIdle();
   }
 
+  async jog(command) {
+    if (this.activeSource !== 'MACHINE') {
+      throw new Error('JOG is only available for the real machine');
+    }
+
+    return cncMachine.jog(command);
+  }
+
   hold() {
     if (this.activeSource !== 'SIMULATOR') {
       throw new Error('No simulator connected');

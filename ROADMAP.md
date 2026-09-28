@@ -50,67 +50,87 @@
   - [x] Criar pasta `src`
   - [x] Criar pasta `public`
 - [x] Definir `src/app.js` como entrada da aplicação
-- [ ] Criar estrutura inicial dos componentes
-- [ ] Criar estrutura inicial dos estilos
+- [x] Criar estrutura inicial dos componentes
+- [x] Criar estrutura inicial dos estilos
 
 ## 0.5 Inventário e montagem inicial
 
-### Equipamentos definidos
+### 0.5.1 Equipamentos definidos
 
 - [x] Definir o Raspberry Pi 5 como computador da máquina
 - [x] Definir o Arduino Uno Rev3 como controlador da CNC
 - [x] Manter o Arduino Micro como placa de desenvolvimento no PC
-- [x] Definir uma CNC Shield para conexão dos drivers ao Arduino Uno Rev3
+- [x] Definir a CNC Shield Ver. 3.00 para conexão dos drivers
 - [x] Definir o A4988 como driver inicial dos motores
-- [x] Definir o NEMA 17 modelo `17HS4401` como motor inicial
-- [x] Identificar a corrente nominal de `1,7 A` por fase do NEMA 17
+- [x] Definir o NEMA 17 `17HS4401` como motor inicial
+- [x] Registrar corrente nominal de `1,7 A` por fase do motor
 - [x] Registrar passo de `1,8°` e `200` passos por volta
-- [x] Definir uma fonte Redrex de `24 V`, `15 A` e `360 W`
-- [x] Verificar a corrente nominal disponível de `15 A`
+- [x] Definir a fonte Redrex de `24 V`, `15 A` e `360 W`
+- [x] Confirmar corrente nominal disponível de `15 A`
 
-### CNC Shield e A4988
+### 0.5.2 CNC Shield e drivers A4988
 
-- [x] Identificar a placa como `CNC Shield Ver. 3.00` para Arduino Uno
+- [x] Identificar a placa como `CNC Shield Ver. 3.00`
 - [x] Confirmar compatibilidade da CNC Shield com GRBL 1.1
-- [x] Identificar o encaixe do A4988 correspondente ao eixo X
-- [x] Confirmar a orientação correta do A4988 antes de encaixá-lo
-- [x] Identificar os módulos `HW-134` como compatíveis com A4988
+- [x] Identificar os encaixes dos drivers dos eixos
+- [x] Confirmar a orientação correta dos A4988
+- [x] Identificar os módulos `HW-134` utilizados
 - [x] Identificar os resistores de sensoriamento como `R100`
 - [x] Registrar resistência de sensoriamento de `0,10 Ω`
-- [x] Definir o modo de microstepping como `1/4`
-- [x] Configurar somente o jumper `M1`
-- [x] Verificar a existência de capacitor eletrolítico próximo à entrada de alimentação
 - [x] Instalar dissipadores nos módulos A4988
 - [x] Definir ventilação adequada para os drivers
+- [x] Verificar capacitor eletrolítico na alimentação da Shield
+
+### 0.5.3 Configuração dos drivers A4988
+
+- [x] Definir microstepping inicial em `1/4`
+- [x] Configurar somente o jumper `M1`
 - [x] Definir `VREF` alvo de `1,00 V`
 - [x] Calcular limite de corrente aproximado de `1,25 A` por fase
 - [x] Medir o `VREF` dos quatro drivers
-- [x] Confirmar valores de `VREF` entre `0,98 V` e `1,00 V`
+- [x] Confirmar `VREF` entre `0,98 V` e `1,00 V`
 - [x] Confirmar limite estimado entre `1,225 A` e `1,25 A` por fase
 - [x] Ajustar e validar o limite de corrente dos A4988
-- [ ] Verificar a temperatura dos drivers durante os ensaios **(adicional)**
+- [x] Verificar temperatura dos drivers durante os ensaios
+- [x] Registrar o resultado do ensaio térmico
 
-### Motor
+### 0.5.4 Preparação dos motores
 
-- [ ] Identificar os pares de bobinas do motor
-- [ ] Confirmar a sequência dos quatro fios
-- [ ] Conectar uma bobina aos terminais `1A` e `1B`
-- [ ] Conectar a outra bobina aos terminais `2A` e `2B`
-- [ ] Confirmar que o motor está desacoplado da CNC
-- [ ] Confirmar que o eixo do motor gira livremente antes da alimentação
+- [x] Identificar os pares de bobinas dos motores
+- [x] Registrar as cores dos fios de cada bobina
+- [x] Confirmar a sequência dos quatro fios
+- [x] Conectar uma bobina aos terminais `1A` e `1B`
+- [x] Conectar a outra bobina aos terminais `2A` e `2B`
+- [x] Confirmar a correspondência entre motor e eixo da CNC
+- [x] Confirmar que o motor de teste está desacoplado da CNC
+- [x] Confirmar que o eixo do motor gira livremente sem alimentação
+- [x] Verificar mecanicamente cabos e conectores dos motores
+- [x] Confirmar a montagem antes de energizar os drivers
 
-### Fonte e segurança elétrica
+### 0.5.5 Fonte e segurança elétrica
 
-- [ ] Confirmar a tensão de entrada configurada para a rede elétrica local
-- [ ] Proteger os terminais de entrada da rede elétrica
-- [ ] Ligar o terminal de proteção à terra quando previsto pelo fabricante
-- [ ] Instalar fusível ou proteção adequada no circuito dos motores
-- [ ] Disponibilizar chave para cortar a alimentação de 24 V
-- [ ] Medir a saída antes de conectar a CNC Shield
-- [ ] Confirmar a polaridade da saída
-- [ ] Confirmar tensão de aproximadamente `24 V DC`
-- [ ] Interligar corretamente os GNDs da fonte, da Shield e do Arduino
-- [ ] Não conectar ou retirar o motor com o driver energizado
+- [x] Confirmar a tensão de entrada configurada para a rede elétrica local (`230 V AC`, Portugal)
+- [x] Proteger os terminais de entrada da rede elétrica
+- [x] Ligar o terminal de proteção à terra quando previsto pelo fabricante
+- [x] Disponibilizar chave de corte na entrada de alimentação `230 V AC`
+- [x] Medir a saída da fonte antes de conectar a CNC Shield
+- [x] Confirmar a polaridade da saída
+- [x] Confirmar tensão de aproximadamente `24 V DC`
+- [x] Interligar corretamente os GNDs da fonte, Shield e Arduino
+- [x] Não conectar ou retirar motores com os drivers energizados
+
+## 0.6 Primeiro teste dos motores
+
+- [x] Energizar a montagem após concluir a inspeção
+- [x] Confirmar ausência de aquecimento ou comportamento anormal
+- [x] Testar inicialmente apenas um eixo
+- [x] Executar movimento curto e em baixa velocidade
+- [x] Confirmar que o motor gira sem perda evidente de passos
+- [x] Confirmar o sentido positivo e negativo do eixo
+- [x] Verificar ruído, vibração e aquecimento durante o ensaio
+- [x] Repetir o procedimento nos demais eixos
+- [x] Confirmar resposta dos eixos X, Y e Z
+- [x] Registrar o resultado do primeiro ensaio
 
 ### Documentação e inspeção
 
@@ -378,21 +398,185 @@
 - [x] Definir estado de arquivo carregado e aguardando execução
 - [x] Definir estado de programa em execução
 - [x] Definir estado de programa concluído
-- [ ] Manter o arquivo carregado após conclusão da execução
-- [ ] Liberar novamente a ação de iniciar após conclusão
-- [ ] Manter JOG bloqueado após conclusão enquanto houver arquivo carregado
+- [x] Manter o arquivo carregado após conclusão da execução
+- [x] Liberar novamente a ação de iniciar após conclusão
+- [x] Manter JOG bloqueado após conclusão enquanto houver arquivo carregado
 - [x] Sincronizar o estado do programa com o Dashboard
 - [x] Restaurar o estado de arquivo carregado após reiniciar o Dashboard
 
 ## 3.3 Execução do G-code
 
-- [ ] Implementar ação para iniciar o G-code carregado
-- [ ] Ler `execute.gcode` para execução
-- [ ] Preparar as linhas do arquivo para envio
-- [ ] Enviar comandos G-code ao Grbl pela comunicação serial
-- [ ] Controlar o avanço das linhas durante a execução
-- [ ] Impedir nova execução enquanto o programa estiver executando
+- [x] Implementar ação para iniciar o G-code carregado
+- [x] Ler `execute.gcode` para execução
+- [x] Preparar as linhas do arquivo para envio
+- [x] Enviar comandos G-code ao Grbl pela comunicação serial
+- [x] Controlar o avanço das linhas durante a execução
+- [x] Impedir nova execução enquanto o programa estiver executando
 - [ ] Atualizar o progresso da execução no Dashboard
-- [ ] Detectar o fim do programa
-- [ ] Retornar o programa ao estado disponível para nova execução
+- [x] Detectar o fim do programa
+- [x] Retornar o programa ao estado disponível para nova execução
 - [ ] Validar execuções consecutivas do mesmo `execute.gcode`
+
+## 3.4 JOG da máquina real
+
+- [ ] Definir o formato interno do comando de JOG
+- [ ] Validar eixo, direção e distância recebidos
+- [ ] Converter a intenção de JOG para comando Grbl
+- [ ] Encaminhar o JOG pelo caminho central de comandos
+- [ ] Permitir JOG somente com a máquina real conectada
+- [ ] Bloquear JOG enquanto existir G-code carregado
+- [ ] Bloquear JOG em estados incompatíveis da máquina
+- [ ] Atualizar a posição pelo estado retornado pelo Grbl
+- [ ] Tratar rejeições e erros do comando de JOG
+- [ ] Validar JOG real nos eixos X, Y e Z
+
+## 3.5 Pausa, retomada e emergência
+
+- [ ] Definir os estados em que o controle de execução é permitido
+- [ ] Implementar pausa real utilizando o mecanismo adequado do Grbl
+- [ ] Atualizar o estado da máquina para `HOLD` durante a pausa
+- [ ] Implementar retomada da execução após pausa
+- [ ] Sincronizar pausa e retomada com o Dashboard
+- [ ] Implementar a ação de emergência para a máquina real
+- [ ] Bloquear novos movimentos durante emergência ou `ALARM`
+- [ ] Definir o procedimento de reposição após emergência
+- [ ] Tratar perda da comunicação durante pausa ou execução
+- [ ] Encaminhar erros e mudanças de estado ao Dashboard
+
+---
+
+# 4 — Testes, segurança e diagnóstico
+
+## 4.1 Estrutura de logs
+
+- [ ] Definir níveis básicos de log
+- [ ] Padronizar as mensagens de log do backend
+- [ ] Registrar conexão e desconexão da CNC
+- [ ] Registrar comandos relevantes enviados ao Grbl
+- [ ] Registrar respostas `ok`, `error` e `ALARM`
+- [ ] Registrar início, conclusão e falha da execução de G-code
+- [ ] Registrar falhas e timeouts de comandos
+- [ ] Registrar perda e recuperação da comunicação serial
+- [ ] Evitar excesso de logs das consultas periódicas de estado
+- [ ] Validar os logs no ambiente de produção do Raspberry Pi
+
+## 4.2 Testes básicos da máquina
+
+- [ ] Validar conexão com a máquina real antes do movimento
+- [ ] Confirmar alimentação e comportamento normal dos drivers
+- [ ] Validar movimento positivo e negativo do eixo X
+- [ ] Validar movimento positivo e negativo do eixo Y
+- [ ] Validar movimento positivo e negativo do eixo Z
+- [ ] Validar movimentos curtos e em baixa velocidade
+- [ ] Confirmar atualização da posição no Dashboard
+- [ ] Confirmar retorno da máquina ao estado `IDLE`
+- [ ] Verificar ruído, vibração e temperatura dos drivers
+- [ ] Registrar os resultados dos primeiros testes físicos
+
+## 4.3 Testes de execução G-code
+
+- [ ] Validar carregamento de `execute.gcode`
+- [ ] Validar início da execução pela máquina real
+- [ ] Confirmar transição `READY → RUNNING`
+- [ ] Confirmar envio controlado das linhas ao Grbl
+- [ ] Confirmar movimento físico correspondente ao programa
+- [ ] Confirmar atualização do progresso no Dashboard
+- [ ] Confirmar detecção do fim e retorno ao estado disponível
+- [ ] Confirmar que o arquivo permanece carregado após a execução
+- [ ] Executar novamente o mesmo `execute.gcode`
+- [ ] Confirmar que o JOG permanece bloqueado enquanto houver arquivo carregado
+
+## 4.4 Testes de falha e segurança
+
+- [ ] Validar rejeição de movimento sem máquina conectada
+- [ ] Validar bloqueio de comandos concorrentes incompatíveis
+- [ ] Validar pausa durante movimento
+- [ ] Validar retomada após pausa
+- [ ] Validar comportamento da emergência
+- [ ] Validar comportamento durante estado `ALARM`
+- [ ] Validar tratamento de respostas `error:n` do Grbl
+- [ ] Validar timeout de comando
+- [ ] Validar perda da comunicação durante operação
+- [ ] Confirmar recuperação controlada após falha
+
+---
+
+# 5 — Limites, homing, configuração e sensores
+
+## 5.1 Sensores de fim de curso
+
+- [ ] Definir os sensores utilizados nos eixos
+- [ ] Definir a posição dos sensores na máquina
+- [ ] Identificar as entradas de limite da CNC Shield
+- [ ] Definir a lógica elétrica dos sensores
+- [ ] Instalar o sensor do eixo X
+- [ ] Instalar o sensor do eixo Y
+- [ ] Instalar o sensor do eixo Z
+- [ ] Organizar e proteger o cabeamento dos sensores
+- [ ] Confirmar a leitura dos sensores pelo Grbl
+- [ ] Validar individualmente cada sensor
+
+## 5.2 Limites da máquina
+
+- [ ] Definir o curso útil do eixo X
+- [ ] Definir o curso útil do eixo Y
+- [ ] Definir o curso útil do eixo Z
+- [ ] Configurar os cursos máximos no Grbl
+- [ ] Configurar `hard limits`
+- [ ] Configurar `soft limits`
+- [ ] Confirmar atuação dos limites físicos
+- [ ] Confirmar bloqueio ao ultrapassar limites lógicos
+- [ ] Confirmar geração de `ALARM` quando aplicável
+- [ ] Validar recuperação após acionamento de limite
+
+## 5.3 Homing
+
+- [ ] Definir a direção de homing de cada eixo
+- [ ] Definir a posição de referência da máquina
+- [ ] Habilitar homing no Grbl
+- [ ] Configurar a direção de busca dos sensores
+- [ ] Configurar velocidade de busca
+- [ ] Configurar velocidade de aproximação
+- [ ] Configurar distância de afastamento do sensor
+- [ ] Executar homing de forma controlada
+- [ ] Executar ciclo completo de homing
+- [ ] Confirmar a posição da máquina após homing
+
+## 5.4 Calibração dos eixos
+
+- [ ] Calcular `steps/mm` inicial do eixo X
+- [ ] Calcular `steps/mm` inicial do eixo Y
+- [ ] Calcular `steps/mm` inicial do eixo Z
+- [ ] Configurar os valores iniciais no Grbl
+- [ ] Executar deslocamento conhecido no eixo X
+- [ ] Executar deslocamento conhecido no eixo Y
+- [ ] Executar deslocamento conhecido no eixo Z
+- [ ] Medir o deslocamento real dos três eixos
+- [ ] Corrigir os valores de `steps/mm`
+- [ ] Validar a precisão final dos movimentos
+
+## 5.5 Sensores e monitorização
+
+- [ ] Definir os sensores adicionais necessários
+- [ ] Definir os sensores de temperatura utilizados
+- [ ] Definir os pontos de medição de temperatura
+- [ ] Integrar a leitura dos sensores ao Raspberry Pi
+- [ ] Enviar os valores dos sensores ao backend
+- [ ] Integrar os valores ao estado da CNC
+- [ ] Exibir os valores no Dashboard
+- [ ] Definir limites de aviso
+- [ ] Registrar eventos relevantes nos logs
+- [ ] Validar os sensores durante operação da máquina
+
+## 5.6 Configuração final do Grbl
+
+- [ ] Revisar os parâmetros atuais do Grbl
+- [ ] Configurar `steps/mm` definitivos
+- [ ] Configurar velocidade máxima dos eixos
+- [ ] Configurar aceleração dos eixos
+- [ ] Configurar curso máximo dos eixos
+- [ ] Configurar parâmetros de homing
+- [ ] Configurar parâmetros de limites
+- [ ] Validar o sentido dos eixos
+- [ ] Exportar a configuração final do Grbl
+- [ ] Registrar a configuração final no projeto

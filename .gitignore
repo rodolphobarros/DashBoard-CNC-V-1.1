@@ -151,4 +151,4 @@ vite.config.ts.timestamp-*
 ROADMAP.simulador.md
 
 # Pasta do g-code
-data/gcode/execute.gcode
+data/gcode/*.gcode

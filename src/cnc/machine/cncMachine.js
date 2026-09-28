@@ -191,6 +191,43 @@ class CNCMachine {
     this.notifyStateChange();
   }
 
+  async jog({ axis, direction, step }) {
+    const allowedAxes = new Set(['x', 'y', 'z']);
+    const allowedSteps = new Set([0.1, 1, 10]);
+
+    if (!allowedAxes.has(axis)) {
+      throw new Error(`Invalid JOG axis: ${axis}`);
+    }
+
+    if (direction !== 1 && direction !== -1) {
+      throw new Error(`Invalid JOG direction: ${direction}`);
+    }
+
+    if (!allowedSteps.has(step)) {
+      throw new Error(`Invalid JOG step: ${step}`);
+    }
+
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    if (this.status !== 'IDLE' && this.status !== 'JOG') {
+      throw new Error(`JOG is not allowed while Grbl is ${this.status}`);
+    }
+
+    const axisLetter = axis.toUpperCase();
+    const distance = direction * step;
+    const command = `$J=G91 ${axisLetter}${distance} F60`;
+
+    await this.sendGcodeLine(command);
+
+    return this.getData();
+  }
+
   async sendGcodeLine(line) {
     if (!this.serialConnection.isOpen()) {
       throw new Error('Serial port is not open');
@@ -490,7 +527,7 @@ class CNCMachine {
       })),
 
       capabilities: {
-        jog: false,
+        jog: true,
         emergency: false,
       },
     };

@@ -19,15 +19,41 @@ function registerSocketRouter(socketServer) {
       socket.emit('gcode:state', state);
     });
 
-    socket.on('cnc:jog', async () => {
+    socket.on('cnc:jog', async (command) => {
       try {
+        const allowedAxes = new Set(['x', 'y', 'z']);
+        const allowedSteps = new Set([0.1, 1, 10]);
+
+        if (!command || typeof command !== 'object') {
+          throw new Error('Invalid JOG command');
+        }
+
+        const { axis, direction, step } = command;
+
+        if (!allowedAxes.has(axis)) {
+          throw new Error('Invalid JOG axis');
+        }
+
+        if (direction !== 1 && direction !== -1) {
+          throw new Error('Invalid JOG direction');
+        }
+
+        if (!allowedSteps.has(step)) {
+          throw new Error('Invalid JOG step');
+        }
+
         const isGcodeLoaded = await gcodeService.hasActiveGcodeFile();
 
         if (isGcodeLoaded) {
           throw new Error('JOG blocked while a G-code program is loaded');
         }
 
-        throw new Error('JOG is not available yet');
+        await cncService.jog({ axis, direction, step });
+
+        socket.emit('cnc:command-result', {
+          ok: true,
+          command: 'cnc:jog',
+        });
       } catch (error) {
         console.error('[Socket] CNC jog rejected:', error.message);
 

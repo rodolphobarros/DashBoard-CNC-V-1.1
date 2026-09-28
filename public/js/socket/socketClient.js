@@ -48,6 +48,10 @@ socket.on('disconnect', (reason) => {
   });
 
   dispatchWindowEvent('cnc:state', createDisconnectedState());
+
+  dispatchWindowEvent('cnc:jog-lock-state', {
+    locked: true,
+  });
 });
 
 socket.on('connect_error', (error) => {
@@ -60,6 +64,10 @@ socket.on('connect_error', (error) => {
 
   dispatchWindowEvent('cnc:state', createDisconnectedState());
 
+  dispatchWindowEvent('cnc:jog-lock-state', {
+    locked: true,
+  });
+
   dispatchWindowEvent('cnc:connect-error', {
     message: `Servidor indisponível: ${error.message}`,
   });
@@ -67,6 +75,10 @@ socket.on('connect_error', (error) => {
 
 socket.on('cnc:state', (state) => {
   dispatchWindowEvent('cnc:state', state);
+});
+
+socket.on('cnc:jog-lock-state', (state) => {
+  dispatchWindowEvent('cnc:jog-lock-state', state);
 });
 
 socket.on('gcode:state', (state) => {
@@ -129,6 +141,14 @@ function resumeCNC() {
   return emitCommand('cnc:resume');
 }
 
+function lockJog() {
+  return emitCommand('cnc:jog-lock');
+}
+
+function unlockJog() {
+  return emitCommand('cnc:jog-unlock');
+}
+
 function jog(axis, direction, step) {
   return emitCommand('cnc:jog', { axis, direction, step });
 }
@@ -150,6 +170,8 @@ export {
   disconnectCNC,
   holdCNC,
   resumeCNC,
+  lockJog,
+  unlockJog,
   jog,
   startGcode,
   emergencyStop,

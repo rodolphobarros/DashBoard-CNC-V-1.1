@@ -15,8 +15,70 @@ function registerSocketRouter(socketServer) {
 
     socket.emit('cnc:state', cncService.getState());
 
+    socket.emit('cnc:jog-lock-state', {
+      locked: cncService.isJogLocked(),
+    });
+
     void gcodeService.getState().then((state) => {
       socket.emit('gcode:state', state);
+    });
+
+    socket.on('cnc:jog-lock', () => {
+      try {
+        cncService.lockJog();
+
+        const state = {
+          locked: cncService.isJogLocked(),
+        };
+
+        socketServer.emit('cnc:jog-lock-state', state);
+
+        socket.emit('cnc:command-result', {
+          ok: true,
+          command: 'cnc:jog-lock',
+          state,
+        });
+      } catch (error) {
+        console.error('[Socket] JOG lock failed:', error.message);
+
+        socket.emit('cnc:command-result', {
+          ok: false,
+          command: 'cnc:jog-lock',
+          message: error.message,
+        });
+      }
+    });
+
+    socket.on('cnc:jog-unlock', async () => {
+      try {
+        const gcodeState = await gcodeService.getState();
+
+        if (gcodeState.executionState === 'RUNNING') {
+          throw new Error('JOG cannot be unlocked while G-code is running');
+        }
+
+        cncService.unlockJog();
+
+        const state = {
+          locked: cncService.isJogLocked(),
+        };
+
+        socketServer.emit('cnc:jog-lock-state', state);
+
+        socket.emit('cnc:command-result', {
+          ok: true,
+          command: 'cnc:jog-unlock',
+          state,
+        });
+      } catch (error) {
+        console.error('[Socket] JOG unlock failed:', error.message);
+
+        socket.emit('cnc:command-result', {
+          ok: false,
+          command: 'cnc:jog-unlock',
+          message: error.message,
+        });
+      }
     });
 
     socket.on('cnc:jog', async (command) => {
@@ -42,10 +104,10 @@ function registerSocketRouter(socketServer) {
           throw new Error('Invalid JOG step');
         }
 
-        const isGcodeLoaded = await gcodeService.hasActiveGcodeFile();
+        const gcodeState = await gcodeService.getState();
 
-        if (isGcodeLoaded) {
-          throw new Error('JOG blocked while a G-code program is loaded');
+        if (gcodeState.executionState === 'RUNNING') {
+          throw new Error('JOG blocked while G-code is running');
         }
 
         await cncService.jog({ axis, direction, step });
@@ -67,6 +129,12 @@ function registerSocketRouter(socketServer) {
 
     socket.on('gcode:start', async () => {
       try {
+        cncService.lockJog();
+
+        socketServer.emit('cnc:jog-lock-state', {
+          locked: true,
+        });
+
         const state = await gcodeService.executeActiveGcode();
 
         socket.emit('cnc:command-result', {
@@ -89,6 +157,10 @@ function registerSocketRouter(socketServer) {
       try {
         const state = await cncService.connect(source);
 
+        socketServer.emit('cnc:jog-lock-state', {
+          locked: cncService.isJogLocked(),
+        });
+
         socket.emit('cnc:command-result', {
           ok: true,
           command: 'cnc:connect',
@@ -108,6 +180,10 @@ function registerSocketRouter(socketServer) {
     socket.on('cnc:disconnect', async () => {
       try {
         const state = await cncService.disconnect();
+
+        socketServer.emit('cnc:jog-lock-state', {
+          locked: cncService.isJogLocked(),
+        });
 
         socket.emit('cnc:command-result', {
           ok: true,

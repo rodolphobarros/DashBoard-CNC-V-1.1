@@ -8,10 +8,45 @@ class CNCService {
     this.activeSource = null;
     this.machineUnsubscribe = null;
     this.stateListeners = new Set();
+
+    // JOG starts locked for safety.
+    this.jogLocked = true;
   }
 
   getState() {
     return getState();
+  }
+
+  isJogLocked() {
+    return this.jogLocked;
+  }
+
+  lockJog() {
+    this.jogLocked = true;
+
+    return this.jogLocked;
+  }
+
+  unlockJog() {
+    if (this.activeSource !== 'MACHINE') {
+      throw new Error('JOG can only be unlocked for the real machine');
+    }
+
+    const state = this.getState();
+
+    if (state.connection !== 'CONNECTED') {
+      throw new Error(
+        'JOG cannot be unlocked while the machine is disconnected'
+      );
+    }
+
+    if (state.status !== 'IDLE') {
+      throw new Error(`JOG cannot be unlocked while Grbl is ${state.status}`);
+    }
+
+    this.jogLocked = false;
+
+    return this.jogLocked;
   }
 
   async connect(source) {
@@ -59,6 +94,7 @@ class CNCService {
     } catch (error) {
       this.unsubscribeMachine();
       this.activeSource = null;
+      this.lockJog();
 
       const state = resetState();
       this.notifyStateChange(state);
@@ -70,6 +106,9 @@ class CNCService {
   async disconnect() {
     const source = this.activeSource;
     this.activeSource = null;
+
+    // A new connection must never inherit an unlocked JOG state.
+    this.lockJog();
 
     if (source === 'SIMULATOR') {
       cncSimulator.stop();
@@ -115,6 +154,10 @@ class CNCService {
   async jog(command) {
     if (this.activeSource !== 'MACHINE') {
       throw new Error('JOG is only available for the real machine');
+    }
+
+    if (this.jogLocked) {
+      throw new Error('JOG is locked');
     }
 
     return cncMachine.jog(command);

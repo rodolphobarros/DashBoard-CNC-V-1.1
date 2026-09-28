@@ -1,10 +1,19 @@
-import { jog } from '../../socket/socketClient.js';
+import { jog, lockJog, unlockJog } from '../../socket/socketClient.js';
 
 class CNCAxisPosition extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
       <div class="section-header">
         <h2>Posição dos Eixos</h2>
+
+        <button
+          id="jogLockButton"
+          class="jog-lock-button"
+          type="button"
+          disabled
+        >
+          🔒 Travado
+        </button>
       </div>
 
       <div class="jog-step-selector">
@@ -103,10 +112,12 @@ class CNCAxisPosition extends HTMLElement {
     this.stepSelector = this.querySelector('#jogStep');
     this.jogPad = this.querySelector('.jog-pad');
     this.jogButtons = [...this.querySelectorAll('.jog-button')];
+    this.jogLockButton = this.querySelector('#jogLockButton');
 
     this.canJog = false;
-    this.isGcodeLoaded = true;
+    this.jogLocked = true;
     this.currentState = null;
+    this.gcodeExecutionState = null;
 
     this.stepSelector.disabled = true;
 
@@ -117,6 +128,15 @@ class CNCAxisPosition extends HTMLElement {
     this.positionX = this.querySelector('#posX');
     this.positionY = this.querySelector('#posY');
     this.positionZ = this.querySelector('#posZ');
+
+    this.jogLockButton.addEventListener('click', () => {
+      if (this.jogLocked) {
+        unlockJog();
+        return;
+      }
+
+      lockJog();
+    });
 
     this.jogPad?.addEventListener('click', (event) => {
       const jogButton = event.target.closest('.jog-button');
@@ -143,44 +163,29 @@ class CNCAxisPosition extends HTMLElement {
       this.updateJogControls();
     };
 
+    this.handleJogLockState = (event) => {
+      this.jogLocked = event.detail?.locked !== false;
+
+      this.updateJogControls();
+    };
+
     this.handleGcodeState = (event) => {
-      this.isGcodeLoaded = event.detail?.loaded !== false;
+      this.gcodeExecutionState = event.detail?.executionState ?? null;
 
       this.updateJogControls();
     };
 
     window.addEventListener('cnc:state', this.handleState);
+    window.addEventListener('cnc:jog-lock-state', this.handleJogLockState);
     window.addEventListener('gcode:state', this.handleGcodeState);
 
-    void this.loadGcodeStatus();
+    this.updateJogControls();
   }
 
   disconnectedCallback() {
     window.removeEventListener('cnc:state', this.handleState);
+    window.removeEventListener('cnc:jog-lock-state', this.handleJogLockState);
     window.removeEventListener('gcode:state', this.handleGcodeState);
-  }
-
-  async loadGcodeStatus() {
-    try {
-      const response = await fetch('/api/gcode/status');
-
-      if (!response.ok) {
-        throw new Error('Failed to load G-code status');
-      }
-
-      const gcodeStatus = await response.json();
-
-      this.isGcodeLoaded = gcodeStatus.loaded === true;
-    } catch (error) {
-      console.error(
-        '[AxisPosition] Failed to load G-code status:',
-        error.message
-      );
-
-      this.isGcodeLoaded = true;
-    }
-
-    this.updateJogControls();
   }
 
   updatePosition(state) {
@@ -210,16 +215,27 @@ class CNCAxisPosition extends HTMLElement {
     const isConnected = state?.connection === 'CONNECTED';
     const isJogSupported = state?.capabilities?.jog === true;
     const isEmergencyActive = state?.emergency === true;
+    const isGcodeRunning = this.gcodeExecutionState === 'RUNNING';
 
     const isBlockedStatus =
       state?.status === 'HOLD' || state?.status === 'ALARM';
 
-    this.canJog =
+    const canChangeJogLock =
       isConnected &&
       isJogSupported &&
       !isEmergencyActive &&
       !isBlockedStatus &&
-      !this.isGcodeLoaded;
+      !isGcodeRunning;
+
+    this.canJog = canChangeJogLock && !this.jogLocked;
+
+    this.jogLockButton.disabled = !canChangeJogLock;
+
+    if (this.jogLocked) {
+      this.jogLockButton.textContent = '🔒 Travado';
+    } else {
+      this.jogLockButton.textContent = '🔓 Destravado';
+    }
 
     this.stepSelector.disabled = !this.canJog;
 

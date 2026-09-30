@@ -1,4 +1,5 @@
 import { jog, lockJog, unlockJog } from '../../socket/socketClient.js';
+import { logInfo } from '../../core/util.js';
 
 class CNCAxisPosition extends HTMLElement {
   connectedCallback() {
@@ -149,7 +150,7 @@ class CNCAxisPosition extends HTMLElement {
       const jogDirection = Number(jogButton.dataset.direction);
       const jogStep = Number(this.stepSelector.value);
 
-      console.log(
+      logInfo(
         `[AxisPosition] Jog: axis=${selectedAxis} direction=${jogDirection} step=${jogStep}`
       );
 

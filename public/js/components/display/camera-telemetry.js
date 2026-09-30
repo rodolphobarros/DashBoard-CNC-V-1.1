@@ -1,3 +1,5 @@
+import { logError } from '../../core/util.js';
+
 class CNCCameraTelemetry extends HTMLElement {
   connectedCallback() {
     this.innerHTML = `
@@ -118,7 +120,9 @@ class CNCCameraTelemetry extends HTMLElement {
       this.cameraStreamElement.src =
         configuration.cameraStreamUrl || fallbackStreamUrl;
     } catch (error) {
-      console.error('[Camera] Failed to load configuration:', error);
+      logError(
+        `[Camera] Failed to load configuration: ${error?.message ?? error}`
+      );
 
       this.cameraStatusElement.textContent = 'Indisponível';
     }

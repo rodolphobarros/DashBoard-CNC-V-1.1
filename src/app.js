@@ -1,6 +1,7 @@
 import express from 'express';
 
 import config from './config/config.js';
+import { logInfo } from './core/logger.js';
 import gcodeRoutes from './routes/gcodeRoutes.js';
 import { app, httpServer } from './server/server.js';
 
@@ -19,5 +20,5 @@ app.get('/api/config', (_request, response) => {
 });
 
 httpServer.listen(config.port, '0.0.0.0', () => {
-  console.log(`Server started on port ${config.port}`);
+  logInfo('Server', `Started on port ${config.port}`);
 });

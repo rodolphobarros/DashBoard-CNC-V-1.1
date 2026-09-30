@@ -1,3 +1,5 @@
+import { logError, logInfo, logWarn } from '../core/util.js';
+
 const socket = io();
 
 function dispatchWindowEvent(name, detail) {
@@ -31,7 +33,7 @@ function createDisconnectedState() {
 }
 
 socket.on('connect', () => {
-  console.log(`[Socket] Server connected: ${socket.id}`);
+  logInfo(`[Socket] Server connected: ${socket.id}`);
 
   dispatchWindowEvent('cnc:server-state', {
     connected: true,
@@ -40,7 +42,7 @@ socket.on('connect', () => {
 });
 
 socket.on('disconnect', (reason) => {
-  console.warn(`[Socket] Server disconnected: ${reason}`);
+  logWarn(`[Socket] Server disconnected: ${reason}`);
 
   dispatchWindowEvent('cnc:server-state', {
     connected: false,
@@ -55,7 +57,7 @@ socket.on('disconnect', (reason) => {
 });
 
 socket.on('connect_error', (error) => {
-  console.error('[Socket] Failed to connect to server:', error.message);
+  logError(`[Socket] Failed to connect to server: ${error.message}`);
 
   dispatchWindowEvent('cnc:server-state', {
     connected: false,
@@ -86,16 +88,18 @@ socket.on('gcode:state', (state) => {
 });
 
 socket.on('cnc:connect-error', (error) => {
-  console.error('[Socket] CNC connection error:', error);
+  logError(`[Socket] CNC connection error: ${error?.message ?? error}`);
 
   dispatchWindowEvent('cnc:connect-error', error);
 });
 
 socket.on('cnc:command-result', (result) => {
+  const message = `[Socket] ${result?.command}: ${result?.message}`;
+
   if (result?.ok) {
-    console.log(`[Socket] ${result.command}: ${result.message}`);
+    logInfo(message);
   } else {
-    console.warn(`[Socket] ${result?.command}: ${result?.message}`);
+    logWarn(message);
   }
 
   dispatchWindowEvent('cnc:command-result', result);

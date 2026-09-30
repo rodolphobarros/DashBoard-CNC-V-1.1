@@ -1,4 +1,5 @@
 import { emergencyStop, resetEmergency } from '../../socket/socketClient.js';
+import { logInfo } from '../../core/util.js';
 
 class CNCEmergency extends HTMLElement {
   connectedCallback() {
@@ -56,10 +57,10 @@ class CNCEmergency extends HTMLElement {
       }
 
       if (this.isEmergencyActive) {
-        console.log('[Emergency] Emergency reset requested');
+        logInfo('[Emergency] Emergency reset requested');
         resetEmergency();
       } else {
-        console.log('[Emergency] Emergency stop requested');
+        logInfo('[Emergency] Emergency stop requested');
         emergencyStop();
       }
     });

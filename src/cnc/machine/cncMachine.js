@@ -1,4 +1,5 @@
 import config from '../../config/config.js';
+import { logError, logInfo } from '../../core/logger.js';
 import { SerialConnection } from '../connection/serialConnection.js';
 
 import { parseGrblLine } from './grblParser.js';
@@ -55,7 +56,7 @@ class CNCMachine {
         },
       });
 
-      console.log(`[Machine] Waiting for Grbl: ${serialPath}`);
+      logInfo('Machine', `Waiting for Grbl: ${serialPath}`);
 
       this.startStartupTimeout();
       this.startStatusPolling();
@@ -68,10 +69,7 @@ class CNCMachine {
       this.resetMachineData();
       this.notifyStateChange();
 
-      console.error(
-        '[Machine] Failed to open serial connection:',
-        error.message
-      );
+      logError('Machine', `Failed to open serial connection: ${error.message}`);
 
       throw error;
     }
@@ -103,12 +101,12 @@ class CNCMachine {
 
     switch (response.type) {
       case 'OK':
-        console.log('[Machine] Grbl response: OK');
+        logInfo('Machine', 'Grbl response: OK');
         this.resolvePendingCommand();
         break;
 
       case 'ERROR':
-        console.error(`[Machine] Grbl error: ${response.code}`);
+        logError('Machine', `Grbl error: ${response.code}`);
         this.rejectPendingCommand(
           new Error(`Grbl rejected command with error ${response.code}`)
         );
@@ -134,7 +132,7 @@ class CNCMachine {
           new Error(`Grbl entered alarm state: ${response.code}`)
         );
 
-        console.error(`[Machine] Grbl alarm: ${response.code}`);
+        logError('Machine', `Grbl alarm: ${response.code}`);
 
         this.notifyStateChange();
         break;
@@ -149,7 +147,7 @@ class CNCMachine {
         break;
 
       default:
-        console.log(`[Machine] Grbl: ${response.raw}`);
+        logInfo('Machine', `Grbl: ${response.raw}`);
     }
   }
 
@@ -186,7 +184,7 @@ class CNCMachine {
 
     this.stopStartupTimeout();
 
-    console.log('[Machine] Grbl connection confirmed');
+    logInfo('Machine', 'Grbl connection confirmed');
 
     this.notifyStateChange();
   }
@@ -468,7 +466,7 @@ class CNCMachine {
 
     this.connection = 'DISCONNECTED';
 
-    console.error('[Machine] Communication lost:', error.message);
+    logError('Machine', `Communication lost: ${error.message}`);
 
     this.notifyStateChange();
   }

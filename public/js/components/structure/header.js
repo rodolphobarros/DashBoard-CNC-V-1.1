@@ -2,6 +2,7 @@ import socket, {
   connectCNC,
   disconnectCNC,
 } from '../../socket/socketClient.js';
+import { logError, logInfo } from '../../core/util.js';
 
 class CNCHeader extends HTMLElement {
   connectedCallback() {
@@ -74,7 +75,7 @@ class CNCHeader extends HTMLElement {
       }
 
       if (this.isCNCConnected) {
-        console.log('[Header] CNC disconnect requested');
+        logInfo('[Header] CNC disconnect requested');
 
         disconnectCNC();
         return;
@@ -98,7 +99,7 @@ class CNCHeader extends HTMLElement {
 
       const source = selectedOption.dataset.source;
 
-      console.log(`[Header] CNC connection requested (source: ${source})`);
+      logInfo(`[Header] CNC connection requested (source: ${source})`);
 
       connectCNC(source);
 
@@ -179,7 +180,7 @@ class CNCHeader extends HTMLElement {
       return;
     }
 
-    console.error('[Header] Connection error:', error?.message);
+    logError(`[Header] Connection error: ${error?.message ?? error}`);
 
     this.statusLabel.textContent = 'Erro de conexão';
 

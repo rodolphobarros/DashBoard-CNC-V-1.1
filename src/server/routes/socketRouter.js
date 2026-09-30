@@ -1,3 +1,4 @@
+import { logError, logInfo } from '../../core/logger.js';
 import gcodeService from '../../gcode/gcodeService.js';
 import cncService from '../services/cncService.js';
 
@@ -11,7 +12,7 @@ function registerSocketRouter(socketServer) {
   });
 
   socketServer.on('connection', (socket) => {
-    console.log(`[Socket] Client connected: ${socket.id}`);
+    logInfo('Socket', `Client connected: ${socket.id}`);
 
     socket.emit('cnc:state', cncService.getState());
 
@@ -39,7 +40,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] JOG lock failed:', error.message);
+        logError('Socket', `JOG lock failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -71,7 +72,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] JOG unlock failed:', error.message);
+        logError('Socket', `JOG unlock failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -117,7 +118,7 @@ function registerSocketRouter(socketServer) {
           command: 'cnc:jog',
         });
       } catch (error) {
-        console.error('[Socket] CNC jog rejected:', error.message);
+        logError('Socket', `CNC jog rejected: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -143,7 +144,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] G-code execution failed:', error.message);
+        logError('Socket', `G-code execution failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -167,7 +168,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] CNC connect failed:', error.message);
+        logError('Socket', `CNC connect failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -191,7 +192,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] CNC disconnect failed:', error.message);
+        logError('Socket', `CNC disconnect failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -211,7 +212,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] CNC hold failed:', error.message);
+        logError('Socket', `CNC hold failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -231,7 +232,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] CNC resume failed:', error.message);
+        logError('Socket', `CNC resume failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -251,7 +252,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] CNC emergency failed:', error.message);
+        logError('Socket', `CNC emergency failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -271,7 +272,7 @@ function registerSocketRouter(socketServer) {
           state,
         });
       } catch (error) {
-        console.error('[Socket] CNC emergency reset failed:', error.message);
+        logError('Socket', `CNC emergency reset failed: ${error.message}`);
 
         socket.emit('cnc:command-result', {
           ok: false,
@@ -282,7 +283,7 @@ function registerSocketRouter(socketServer) {
     });
 
     socket.on('disconnect', () => {
-      console.log(`[Socket] Client disconnected: ${socket.id}`);
+      logInfo('Socket', `Client disconnected: ${socket.id}`);
     });
   });
 }

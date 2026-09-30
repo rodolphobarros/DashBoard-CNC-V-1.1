@@ -1,4 +1,5 @@
 import { startGcode } from '../../socket/socketClient.js';
+import { logError } from '../../core/util.js';
 
 class CNCGcodePanel extends HTMLElement {
   connectedCallback() {
@@ -87,7 +88,7 @@ class CNCGcodePanel extends HTMLElement {
 
       this.updateGcodeState(state);
     } catch (error) {
-      console.error('[GcodePanel] Failed to load G-code state:', error.message);
+      logError(`[GcodePanel] Failed to load G-code state: ${error.message}`);
 
       this.statusElement.textContent =
         'Não foi possível verificar o programa carregado.';

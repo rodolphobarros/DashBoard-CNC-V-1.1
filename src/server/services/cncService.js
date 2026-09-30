@@ -1,4 +1,5 @@
 import { getState, resetState, updateState } from '../../cnc/cncState.js';
+import { logError } from '../../core/logger.js';
 
 import cncMachine from '../../cnc/machine/cncMachine.js';
 import cncSimulator from '../../cnc/simulator/cncSimulator.js';
@@ -120,9 +121,9 @@ class CNCService {
       try {
         await cncMachine.close();
       } catch (error) {
-        console.error(
-          '[CNCService] Failed to close machine connection:',
-          error.message
+        logError(
+          'CNCService',
+          `Failed to close machine connection: ${error.message}`
         );
       }
     } else {

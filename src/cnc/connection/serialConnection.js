@@ -1,3 +1,5 @@
+import { logError, logInfo } from '../../core/logger.js';
+
 import { ReadlineParser, SerialPort } from 'serialport';
 
 const SERIAL_BAUD_RATE = 115200;
@@ -54,7 +56,7 @@ class SerialConnection {
       });
 
       serialPort.on('error', (error) => {
-        console.error('[Serial] Port error:', error.message);
+        logError('Serial', `Port error: ${error.message}`);
 
         onError?.(error);
       });
@@ -66,14 +68,14 @@ class SerialConnection {
         this.lineParser = null;
         this.intentionalClose = false;
 
-        console.log(`[Serial] Port closed: ${serialPath}`);
+        logInfo('Serial', `Port closed: ${serialPath}`);
 
         if (!wasIntentional) {
           onClose?.();
         }
       });
 
-      console.log(`[Serial] Port opened: ${serialPath} @ ${SERIAL_BAUD_RATE}`);
+      logInfo('Serial', `Port opened: ${serialPath} @ ${SERIAL_BAUD_RATE}`);
     } catch (error) {
       this.serialPort = null;
       this.lineParser = null;
@@ -119,7 +121,7 @@ class SerialConnection {
 
     this.serialPort.write(data, (error) => {
       if (error) {
-        console.error('[Serial] Failed to write:', error.message);
+        logError('Serial', `Failed to write: ${error.message}`);
       }
     });
   }

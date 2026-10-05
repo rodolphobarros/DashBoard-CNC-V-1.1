@@ -502,12 +502,12 @@
 ## 4.4 Testes de falha e segurança
 
 - [x] Validar rejeição de movimento sem máquina conectada
-- [ ] Validar bloqueio de comandos concorrentes incompatíveis
+- [x] Validar bloqueio de comandos concorrentes incompatíveis
 - [ ] Validar pausa durante movimento
 - [ ] Validar retomada após pausa
 - [ ] Validar comportamento da emergência
 - [ ] Validar comportamento durante estado `ALARM`
-- [ ] Validar tratamento de respostas `error:n` do Grbl
+- [x] Validar tratamento de respostas `error:n` do Grbl
 - [ ] Validar timeout de comando
 - [ ] Validar perda da comunicação durante operação
 - [ ] Confirmar recuperação controlada após falha
@@ -570,13 +570,15 @@
 
 ## 5.5 Sensores e monitorização
 
+### 5.5.1 Monitorização da caixa dos drivers — DHT20
+
 - [x] Definir o DHT20 como sensor de temperatura e umidade
 - [x] Definir a região dos drivers como ponto de medição de temperatura
 - [x] Instalar o DHT20 na tampa da caixa próximo aos quatro drivers
-- [ ] Integrar a leitura do DHT20 ao Raspberry Pi
-- [ ] Enviar os valores do sensor ao backend
-- [ ] Integrar os valores ao estado da CNC
-- [ ] Exibir os valores no Dashboard
+- [x] Integrar a leitura do DHT20 ao Raspberry Pi
+- [x] Enviar os valores do sensor ao backend
+- [x] Integrar os valores ao estado da CNC
+- [x] Exibir os valores no Dashboard
 - [ ] Definir limites de aviso
 - [ ] Registrar eventos relevantes nos logs
 - [ ] Validar o sensor durante operação da máquina
@@ -586,9 +588,22 @@
 > representa a temperatura do ar nessa região e não a temperatura direta
 > dos A4988.
 
+### 5.5.2 Monitorização da temperatura do spindle — DS18B20
+
+- [ ] Definir o DS18B20 como sensor de temperatura do spindle
+- [ ] Definir o ponto de instalação no spindle
+- [ ] Definir a fixação térmica e proteção do sensor
+- [ ] Integrar fisicamente o DS18B20 ao Raspberry Pi
+- [ ] Configurar e validar a interface 1-Wire
+- [ ] Integrar a leitura do DS18B20 ao backend
+- [ ] Integrar a leitura ao campo `spindleTemp`
+- [ ] Exibir a temperatura real do spindle no Dashboard
+- [ ] Definir limite de aviso da temperatura do spindle
+- [ ] Validar a leitura durante operação da máquina
+
 ## 5.6 Configuração final do Grbl
 
-- [ ] Revisar os parâmetros atuais do Grbl
+- [x] Revisar os parâmetros atuais do Grbl
 - [ ] Configurar `steps/mm` definitivos
 - [ ] Configurar velocidade máxima dos eixos
 - [ ] Configurar aceleração dos eixos

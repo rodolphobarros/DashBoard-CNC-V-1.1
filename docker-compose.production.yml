@@ -23,6 +23,7 @@ services:
 
     group_add:
       - '${DIALOUT_GID:-20}'
+      - '${I2C_GID:-988}'
 
     devices:
       - '${CNC_SERIAL_PORT:-/dev/ttyACM0}:${CNC_SERIAL_PORT:-/dev/ttyACM0}'

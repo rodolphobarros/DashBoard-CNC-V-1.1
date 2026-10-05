@@ -8,7 +8,7 @@ class CNCThermalMonitor extends HTMLElement {
             <div class="thermal-monitor-content">
                 <div class="temperature-card">
                     <span class="temperature-label">
-                        Temperatura do driver
+                        Temperatura dos drivers
                     </span>
 
                     <div class="temperature-value">
@@ -27,11 +27,23 @@ class CNCThermalMonitor extends HTMLElement {
                         <span class="temperature-unit">°C</span>
                     </div>
                 </div>
+
+                <div class="temperature-card">
+                    <span class="temperature-label">
+                        Humidade
+                    </span>
+
+                    <div class="temperature-value">
+                        <span id="humidity">---</span>
+                        <span class="temperature-unit">%</span>
+                    </div>
+                </div>
             </div>
         `;
 
     this.driverTemperature = this.querySelector('#driverTemperature');
     this.spindleTemperature = this.querySelector('#spindleTemperature');
+    this.humidity = this.querySelector('#humidity');
 
     this.handleState = (event) => this.updateTemperatures(event.detail);
     window.addEventListener('cnc:state', this.handleState);
@@ -44,17 +56,24 @@ class CNCThermalMonitor extends HTMLElement {
   updateTemperatures(state) {
     const isConnected = state?.connection === 'CONNECTED';
 
-    const hasValidTemperatures =
-      Number.isFinite(state?.driverTemp) && Number.isFinite(state?.spindleTemp);
-
-    if (!isConnected || !hasValidTemperatures) {
+    if (!isConnected) {
       this.driverTemperature.textContent = '---';
       this.spindleTemperature.textContent = '---';
+      this.humidity.textContent = '---';
       return;
     }
 
-    this.driverTemperature.textContent = state.driverTemp.toFixed(1);
-    this.spindleTemperature.textContent = state.spindleTemp.toFixed(1);
+    this.driverTemperature.textContent = Number.isFinite(state?.driverTemp)
+      ? state.driverTemp.toFixed(1)
+      : '---';
+
+    this.spindleTemperature.textContent = Number.isFinite(state?.spindleTemp)
+      ? state.spindleTemp.toFixed(1)
+      : '---';
+
+    this.humidity.textContent = Number.isFinite(state?.humidity)
+      ? state.humidity.toFixed(1)
+      : '---';
   }
 }
 

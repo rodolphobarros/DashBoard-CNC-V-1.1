@@ -9,6 +9,7 @@ const initialState = {
   spindleSpeed: null,
 
   driverTemp: null,
+  humidity: null,
   spindleTemp: null,
 
   emergency: false,

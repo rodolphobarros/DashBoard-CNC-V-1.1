@@ -26,5 +26,6 @@ services:
 
     devices:
       - '${CNC_SERIAL_PORT:-/dev/ttyACM0}:${CNC_SERIAL_PORT:-/dev/ttyACM0}'
+      - '/dev/i2c-1:/dev/i2c-1'
 
     restart: unless-stopped

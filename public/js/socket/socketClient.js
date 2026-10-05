@@ -24,6 +24,7 @@ function createDisconnectedState() {
     spindleSpeed: null,
     driverTemp: null,
     spindleTemp: null,
+    humidity: null,
     alarms: [],
     capabilities: {
       jog: false,

@@ -3,6 +3,9 @@ import { logError, logInfo } from '../../core/logger.js';
 import { SerialConnection } from '../connection/serialConnection.js';
 
 import { parseGrblLine } from './grblParser.js';
+import { readThermalSensors } from './sensors/thermalSensors.js';
+
+const THERMAL_POLLING_INTERVAL_MS = 5000;
 
 class CNCMachine {
   constructor() {
@@ -13,12 +16,16 @@ class CNCMachine {
     this.statusIntervalId = null;
     this.startupTimeoutId = null;
     this.statusTimeoutId = null;
+    this.thermalIntervalId = null;
 
     this.status = null;
     this.position = null;
 
     this.feedRate = null;
     this.spindleSpeed = null;
+
+    this.driverTemp = null;
+    this.humidity = null;
 
     this.alarms = [];
 
@@ -183,6 +190,7 @@ class CNCMachine {
     this.connection = 'CONNECTED';
 
     this.stopStartupTimeout();
+    this.startThermalMonitoring();
 
     logInfo('Machine', 'Grbl connection confirmed');
 
@@ -449,10 +457,58 @@ class CNCMachine {
     this.statusTimeoutId = null;
   }
 
+  startThermalMonitoring() {
+    if (this.thermalIntervalId) {
+      return;
+    }
+
+    void this.updateThermalSensors();
+
+    this.thermalIntervalId = setInterval(() => {
+      void this.updateThermalSensors();
+    }, THERMAL_POLLING_INTERVAL_MS);
+  }
+
+  stopThermalMonitoring() {
+    if (!this.thermalIntervalId) {
+      return;
+    }
+
+    clearInterval(this.thermalIntervalId);
+    this.thermalIntervalId = null;
+  }
+
+  async updateThermalSensors() {
+    try {
+      const thermalData = await readThermalSensors();
+
+      if (this.connection !== 'CONNECTED') {
+        return;
+      }
+
+      this.driverTemp = thermalData.driverTemp;
+      this.humidity = thermalData.humidity;
+
+      this.notifyStateChange();
+    } catch (error) {
+      if (this.connection !== 'CONNECTED') {
+        return;
+      }
+
+      this.driverTemp = null;
+      this.humidity = null;
+
+      logError('Machine', `Thermal sensor reading failed: ${error.message}`);
+
+      this.notifyStateChange();
+    }
+  }
+
   stopTimers() {
     this.stopStatusPolling();
     this.stopStartupTimeout();
     this.stopStatusTimeout();
+    this.stopThermalMonitoring();
   }
 
   handleCommunicationLoss(error) {
@@ -465,6 +521,7 @@ class CNCMachine {
     this.stopTimers();
 
     this.connection = 'DISCONNECTED';
+    this.resetMachineData();
 
     logError('Machine', `Communication lost: ${error.message}`);
 
@@ -477,6 +534,9 @@ class CNCMachine {
 
     this.feedRate = null;
     this.spindleSpeed = null;
+
+    this.driverTemp = null;
+    this.humidity = null;
 
     this.alarms = [];
   }
@@ -511,8 +571,9 @@ class CNCMachine {
       // Nenhum controle de velocidade do spindle é implementado.
       spindleSpeed: this.spindleSpeed,
 
-      driverTemp: null,
+      driverTemp: this.driverTemp,
       spindleTemp: null,
+      humidity: this.humidity,
 
       emergency: false,
       lastEmergencyAt: null,

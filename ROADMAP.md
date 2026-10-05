@@ -419,18 +419,31 @@
 
 ## 3.4 JOG da máquina real
 
-- [ ] Definir o formato interno do comando de JOG
-- [ ] Validar eixo, direção e distância recebidos
-- [ ] Converter a intenção de JOG para comando Grbl
-- [ ] Encaminhar o JOG pelo caminho central de comandos
-- [ ] Permitir JOG somente com a máquina real conectada
-- [ ] Bloquear JOG enquanto existir G-code carregado
-- [ ] Bloquear JOG em estados incompatíveis da máquina
-- [ ] Atualizar a posição pelo estado retornado pelo Grbl
-- [ ] Tratar rejeições e erros do comando de JOG
-- [ ] Validar JOG real nos eixos X, Y e Z
+- [x] Definir o formato interno do comando de JOG
+- [x] Validar eixo, direção e distância recebidos
+- [x] Converter a intenção de JOG para comando Grbl
+- [x] Encaminhar o JOG pelo caminho central de comandos
+- [x] Permitir JOG somente com a máquina real conectada
+- [x] Bloquear JOG enquanto existir G-code carregado
+- [x] Bloquear JOG em estados incompatíveis da máquina
+- [x] Atualizar a posição pelo estado retornado pelo Grbl
+- [x] Tratar rejeições e erros do comando de JOG
+- [x] Validar JOG real nos eixos X, Y e Z
 
-## 3.5 Pausa, retomada e emergência
+## 3.5 Execução de G-code na máquina real
+
+- [x] Garantir que o JOG seja travado antes do primeiro comando G-code
+- [x] Preparar um arquivo G-code mínimo para teste real
+- [x] Enviar a primeira linha executável ao Grbl
+- [x] Aguardar a resposta `ok` antes de enviar a próxima linha
+- [x] Continuar o envio sequencial até o final do arquivo
+- [ ] Interromper a execução caso o Grbl retorne `error` ou `ALARM`
+- [x] Atualizar a posição da máquina durante a execução
+- [x] Detectar o retorno do Grbl ao estado `Idle` ao final
+- [x] Alterar o estado do programa de `RUNNING` para `COMPLETED`
+- [ ] Adicional: validar condições antes de iniciar a execução
+
+## 3.6 Pausa, retomada e emergência
 
 - [ ] Definir os estados em que o controle de execução é permitido
 - [ ] Implementar pausa real utilizando o mecanismo adequado do Grbl
@@ -449,46 +462,46 @@
 
 ## 4.1 Estrutura de logs
 
-- [ ] Definir níveis básicos de log
-- [ ] Padronizar as mensagens de log do backend
-- [ ] Registrar conexão e desconexão da CNC
+- [x] Definir níveis básicos de log
+- [x] Padronizar as mensagens de log do backend
+- [x] Registrar conexão e desconexão da CNC
 - [ ] Registrar comandos relevantes enviados ao Grbl
-- [ ] Registrar respostas `ok`, `error` e `ALARM`
+- [x] Registrar respostas `ok`, `error` e `ALARM`
 - [ ] Registrar início, conclusão e falha da execução de G-code
 - [ ] Registrar falhas e timeouts de comandos
 - [ ] Registrar perda e recuperação da comunicação serial
-- [ ] Evitar excesso de logs das consultas periódicas de estado
-- [ ] Validar os logs no ambiente de produção do Raspberry Pi
+- [x] Evitar excesso de logs das consultas periódicas de estado
+- [x] Validar os logs no ambiente de produção do Raspberry Pi
 
 ## 4.2 Testes básicos da máquina
 
-- [ ] Validar conexão com a máquina real antes do movimento
-- [ ] Confirmar alimentação e comportamento normal dos drivers
-- [ ] Validar movimento positivo e negativo do eixo X
-- [ ] Validar movimento positivo e negativo do eixo Y
-- [ ] Validar movimento positivo e negativo do eixo Z
-- [ ] Validar movimentos curtos e em baixa velocidade
-- [ ] Confirmar atualização da posição no Dashboard
-- [ ] Confirmar retorno da máquina ao estado `IDLE`
-- [ ] Verificar ruído, vibração e temperatura dos drivers
-- [ ] Registrar os resultados dos primeiros testes físicos
+- [x] Validar conexão com a máquina real antes do movimento
+- [x] Confirmar alimentação e comportamento normal dos drivers
+- [x] Validar movimento positivo e negativo do eixo X
+- [x] Validar movimento positivo e negativo do eixo Y
+- [x] Validar movimento positivo e negativo do eixo Z
+- [x] Validar movimentos curtos e em baixa velocidade
+- [x] Confirmar atualização da posição no Dashboard
+- [x] Confirmar retorno da máquina ao estado `IDLE`
+- [x] Verificar ruído, vibração e temperatura dos drivers
+- [x] Registrar os resultados dos primeiros testes físicos
 
 ## 4.3 Testes de execução G-code
 
-- [ ] Validar carregamento de `execute.gcode`
-- [ ] Validar início da execução pela máquina real
-- [ ] Confirmar transição `READY → RUNNING`
-- [ ] Confirmar envio controlado das linhas ao Grbl
-- [ ] Confirmar movimento físico correspondente ao programa
+- [x] Validar carregamento de `execute.gcode`
+- [x] Validar início da execução pela máquina real
+- [x] Confirmar transição `READY → RUNNING`
+- [x] Confirmar envio controlado das linhas ao Grbl
+- [x] Confirmar movimento físico correspondente ao programa
 - [ ] Confirmar atualização do progresso no Dashboard
-- [ ] Confirmar detecção do fim e retorno ao estado disponível
-- [ ] Confirmar que o arquivo permanece carregado após a execução
+- [x] Confirmar detecção do fim e retorno ao estado disponível
+- [x] Confirmar que o arquivo permanece carregado após a execução
 - [ ] Executar novamente o mesmo `execute.gcode`
 - [ ] Confirmar que o JOG permanece bloqueado enquanto houver arquivo carregado
 
 ## 4.4 Testes de falha e segurança
 
-- [ ] Validar rejeição de movimento sem máquina conectada
+- [x] Validar rejeição de movimento sem máquina conectada
 - [ ] Validar bloqueio de comandos concorrentes incompatíveis
 - [ ] Validar pausa durante movimento
 - [ ] Validar retomada após pausa
@@ -505,11 +518,11 @@
 
 ## 5.1 Sensores de fim de curso
 
-- [ ] Definir os sensores utilizados nos eixos
+- [x] Definir os sensores utilizados nos eixos
 - [ ] Definir a posição dos sensores na máquina
-- [ ] Identificar as entradas de limite da CNC Shield
+- [x] Identificar as entradas de limite da CNC Shield
 - [ ] Definir a lógica elétrica dos sensores
-- [ ] Instalar o sensor do eixo X
+- [x] Instalar o sensor do eixo X
 - [ ] Instalar o sensor do eixo Y
 - [ ] Instalar o sensor do eixo Z
 - [ ] Organizar e proteger o cabeamento dos sensores
@@ -557,16 +570,21 @@
 
 ## 5.5 Sensores e monitorização
 
-- [ ] Definir os sensores adicionais necessários
-- [ ] Definir os sensores de temperatura utilizados
-- [ ] Definir os pontos de medição de temperatura
-- [ ] Integrar a leitura dos sensores ao Raspberry Pi
-- [ ] Enviar os valores dos sensores ao backend
+- [x] Definir o DHT20 como sensor de temperatura e umidade
+- [x] Definir a região dos drivers como ponto de medição de temperatura
+- [x] Instalar o DHT20 na tampa da caixa próximo aos quatro drivers
+- [ ] Integrar a leitura do DHT20 ao Raspberry Pi
+- [ ] Enviar os valores do sensor ao backend
 - [ ] Integrar os valores ao estado da CNC
 - [ ] Exibir os valores no Dashboard
 - [ ] Definir limites de aviso
 - [ ] Registrar eventos relevantes nos logs
-- [ ] Validar os sensores durante operação da máquina
+- [ ] Validar o sensor durante operação da máquina
+
+> **Observação:** a “temperatura dos drivers” é obtida pelo sensor DHT20
+> instalado na tampa da caixa, próximo aos quatro drivers. A leitura
+> representa a temperatura do ar nessa região e não a temperatura direta
+> dos A4988.
 
 ## 5.6 Configuração final do Grbl
 

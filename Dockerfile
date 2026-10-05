@@ -47,7 +47,11 @@ ENV NODE_ENV=production
 WORKDIR /src/app
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends udev \
+    && apt-get install -y --no-install-recommends \
+        udev \
+        python3 \
+        make \
+        g++ \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --chown=node:node package*.json ./

@@ -261,6 +261,11 @@ class CNCMachine {
 
         this.pendingCommand = null;
 
+        logError(
+          'Machine',
+          `Grbl command timeout after ${config.grbl.commandTimeoutMs} ms: ${command}`
+        );
+
         reject(
           new Error(
             `Grbl did not acknowledge command within ${config.grbl.commandTimeoutMs} ms`
@@ -275,6 +280,7 @@ class CNCMachine {
       };
 
       try {
+        logInfo('Machine', `Grbl command: ${command}`);
         this.serialConnection.write(`${command}\n`);
       } catch (error) {
         clearTimeout(timeoutId);

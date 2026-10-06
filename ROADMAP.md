@@ -508,7 +508,7 @@
 - [ ] Validar comportamento da emergência
 - [ ] Validar comportamento durante estado `ALARM`
 - [x] Validar tratamento de respostas `error:n` do Grbl
-- [ ] Validar timeout de comando
+- [x] Validar timeout de comando
 - [ ] Validar perda da comunicação durante operação
 - [ ] Confirmar recuperação controlada após falha
 

@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
+import config from '../../src/config/config.js';
 import cncMachine from '../../src/cnc/machine/cncMachine.js';
 
 function createFakeSerialConnection() {
@@ -80,6 +81,29 @@ test('rejects a concurrent command while another command awaits Grbl', async () 
 
     assert.equal(cncMachine.pendingCommand, null);
   } finally {
+    restore();
+  }
+});
+
+test('rejects command when Grbl acknowledgement times out', async () => {
+  const originalCommandTimeoutMs = config.grbl.commandTimeoutMs;
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+
+  config.grbl.commandTimeoutMs = 20;
+
+  try {
+    const commandPromise = cncMachine.sendGcodeLine('G0 X1');
+
+    assert.deepEqual(fakeSerialConnection.writes, ['G0 X1\n']);
+
+    await assert.rejects(
+      commandPromise,
+      /Grbl did not acknowledge command within 20 ms/
+    );
+
+    assert.equal(cncMachine.pendingCommand, null);
+  } finally {
+    config.grbl.commandTimeoutMs = originalCommandTimeoutMs;
     restore();
   }
 });

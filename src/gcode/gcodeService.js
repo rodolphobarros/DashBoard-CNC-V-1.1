@@ -1,6 +1,8 @@
 import { access, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
+import { logError, logInfo } from '../core/logger.js';
+
 import gcodeExecutor from './gcodeExecutor.js';
 
 const gcodeDirectoryPath = path.resolve('data/gcode');
@@ -77,14 +79,23 @@ async function executeActiveGcode() {
 
   await markRunning();
 
+  logInfo('G-code', 'Execution started');
+
   try {
     await gcodeExecutor.execute();
-    return await markCompleted();
+
+    const state = await markCompleted();
+
+    logInfo('G-code', 'Execution completed');
+
+    return state;
   } catch (error) {
     executionState = executionStates.READY;
 
     const state = await getState();
     notifyStateChange(state);
+
+    logError('G-code', `Execution failed: ${error.message}`);
 
     throw error;
   }

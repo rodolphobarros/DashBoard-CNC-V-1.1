@@ -254,6 +254,26 @@ class CNCMachine {
     return this.getData();
   }
 
+  resume() {
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    if (this.status !== 'HOLD') {
+      throw new Error(`Resume is not allowed while Grbl is ${this.status}`);
+    }
+
+    logInfo('Machine', 'Grbl realtime command: Cycle Start (~)');
+
+    this.serialConnection.write('~');
+
+    return this.getData();
+  }
+
   async sendGcodeLine(line) {
     if (!this.serialConnection.isOpen()) {
       throw new Error('Serial port is not open');

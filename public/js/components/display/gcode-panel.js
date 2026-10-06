@@ -1,4 +1,4 @@
-import { startGcode } from '../../socket/socketClient.js';
+import { holdCNC, resumeCNC, startGcode } from '../../socket/socketClient.js';
 import { logError } from '../../core/util.js';
 
 class CNCGcodePanel extends HTMLElement {
@@ -43,6 +43,11 @@ class CNCGcodePanel extends HTMLElement {
       executionState: 'NO_FILE',
     };
 
+    this.cncState = {
+      connection: 'DISCONNECTED',
+      status: null,
+    };
+
     this.fileInputElement.addEventListener('change', () => {
       void this.showSelectedFile();
     });
@@ -52,27 +57,33 @@ class CNCGcodePanel extends HTMLElement {
     });
 
     this.startButtonElement.addEventListener('click', () => {
-      this.startProgram();
+      this.handleProgramControl();
     });
 
     this.handleGcodeState = (event) => {
       this.updateGcodeState(event.detail);
     };
 
+    this.handleCncState = (event) => {
+      this.updateCncState(event.detail);
+    };
+
     this.handleCommandResult = (event) => {
-      this.handleStartResult(event.detail);
+      this.handleProgramControlResult(event.detail);
     };
 
     window.addEventListener('gcode:state', this.handleGcodeState);
+    window.addEventListener('cnc:state', this.handleCncState);
     window.addEventListener('cnc:command-result', this.handleCommandResult);
 
-    this.setProgramState('NO_FILE');
+    this.setProgramState();
 
     void this.loadGcodeState();
   }
 
   disconnectedCallback() {
     window.removeEventListener('gcode:state', this.handleGcodeState);
+    window.removeEventListener('cnc:state', this.handleCncState);
     window.removeEventListener('cnc:command-result', this.handleCommandResult);
   }
 
@@ -93,43 +104,75 @@ class CNCGcodePanel extends HTMLElement {
       this.statusElement.textContent =
         'Não foi possível verificar o programa carregado.';
 
-      this.setProgramState('NO_FILE');
+      this.setProgramState();
     }
   }
 
   updateGcodeState(state) {
     this.gcodeState = state;
 
-    this.setProgramState(state.executionState);
+    this.updateProgramDisplay();
+  }
 
-    if (state.executionState === 'NO_FILE') {
+  updateCncState(state) {
+    this.cncState = state;
+
+    this.updateProgramDisplay();
+  }
+
+  updateProgramDisplay() {
+    this.setProgramState();
+
+    if (this.gcodeState.executionState === 'NO_FILE') {
       this.statusElement.textContent = 'Nenhum programa carregado.';
       return;
     }
 
-    if (state.executionState === 'READY') {
+    if (this.gcodeState.executionState === 'READY') {
       this.statusElement.textContent =
         'Programa carregado e pronto para execução.';
       return;
     }
 
-    if (state.executionState === 'RUNNING') {
+    if (this.gcodeState.executionState === 'RUNNING') {
+      if (this.cncState.status === 'HOLD') {
+        this.statusElement.textContent = 'Programa pausado.';
+        return;
+      }
+
       this.statusElement.textContent = 'Programa em execução.';
       return;
     }
 
-    if (state.executionState === 'COMPLETED') {
+    if (this.gcodeState.executionState === 'COMPLETED') {
       this.statusElement.textContent =
         'Programa concluído. Programa permanece carregado.';
     }
   }
 
-  setProgramState(programState) {
+  setProgramState() {
+    const programState = this.gcodeState.executionState;
+    const machineStatus = this.cncState.status;
+
     this.startButtonElement.classList.remove('gcode-panel__start--running');
 
     if (programState === 'READY' || programState === 'COMPLETED') {
       this.startButtonElement.disabled = false;
       this.startButtonElement.textContent = 'Iniciar programa';
+      return;
+    }
+
+    if (programState === 'RUNNING' && machineStatus === 'RUN') {
+      this.startButtonElement.disabled = false;
+      this.startButtonElement.textContent = 'Pausar programa';
+      this.startButtonElement.classList.add('gcode-panel__start--running');
+      return;
+    }
+
+    if (programState === 'RUNNING' && machineStatus === 'HOLD') {
+      this.startButtonElement.disabled = false;
+      this.startButtonElement.textContent = 'Retomar programa';
+      this.startButtonElement.classList.add('gcode-panel__start--running');
       return;
     }
 
@@ -144,26 +187,62 @@ class CNCGcodePanel extends HTMLElement {
     this.startButtonElement.textContent = 'Iniciar programa — indisponível';
   }
 
-  startProgram() {
-    if (
-      this.gcodeState.executionState !== 'READY' &&
-      this.gcodeState.executionState !== 'COMPLETED'
-    ) {
+  handleProgramControl() {
+    const programState = this.gcodeState.executionState;
+    const machineStatus = this.cncState.status;
+
+    if (programState === 'READY' || programState === 'COMPLETED') {
+      this.startProgram();
       return;
     }
 
+    if (programState === 'RUNNING' && machineStatus === 'RUN') {
+      this.pauseProgram();
+      return;
+    }
+
+    if (programState === 'RUNNING' && machineStatus === 'HOLD') {
+      this.resumeProgram();
+    }
+  }
+
+  startProgram() {
     this.startButtonElement.disabled = true;
     this.statusElement.textContent = 'Solicitando início do programa...';
 
     const emitted = startGcode();
 
     if (!emitted) {
-      this.setProgramState(this.gcodeState.executionState);
+      this.setProgramState();
     }
   }
 
-  handleStartResult(result) {
-    if (result?.command !== 'gcode:start') {
+  pauseProgram() {
+    this.startButtonElement.disabled = true;
+    this.statusElement.textContent = 'Solicitando pausa do programa...';
+
+    const emitted = holdCNC();
+
+    if (!emitted) {
+      this.updateProgramDisplay();
+    }
+  }
+
+  resumeProgram() {
+    this.startButtonElement.disabled = true;
+    this.statusElement.textContent = 'Solicitando retomada do programa...';
+
+    const emitted = resumeCNC();
+
+    if (!emitted) {
+      this.updateProgramDisplay();
+    }
+  }
+
+  handleProgramControlResult(result) {
+    const supportedCommands = ['gcode:start', 'cnc:hold', 'cnc:resume'];
+
+    if (!supportedCommands.includes(result?.command)) {
       return;
     }
 
@@ -172,9 +251,9 @@ class CNCGcodePanel extends HTMLElement {
     }
 
     this.statusElement.textContent =
-      result.message || 'Não foi possível iniciar o programa.';
+      result.message || 'Não foi possível controlar o programa.';
 
-    this.setProgramState(this.gcodeState.executionState);
+    this.setProgramState();
   }
 
   async uploadSelectedFile() {

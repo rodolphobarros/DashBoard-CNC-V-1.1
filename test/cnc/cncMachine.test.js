@@ -158,3 +158,54 @@ test('updates machine status to HOLD from Grbl Hold status report', () => {
     restore();
   }
 });
+test('sends Grbl Cycle Start realtime command while machine is on HOLD', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalStatus = cncMachine.status;
+
+  cncMachine.status = 'HOLD';
+
+  try {
+    const state = cncMachine.resume();
+
+    assert.deepEqual(fakeSerialConnection.writes, ['~']);
+    assert.equal(state.status, 'HOLD');
+  } finally {
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+
+test('rejects resume when Grbl is not on HOLD', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalStatus = cncMachine.status;
+
+  cncMachine.status = 'RUN';
+
+  try {
+    assert.throws(
+      () => cncMachine.resume(),
+      /Resume is not allowed while Grbl is RUN/
+    );
+
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+
+test('updates machine status to RUN after Grbl resumes from HOLD', () => {
+  const { restore } = prepareConnectedMachine();
+  const originalStatus = cncMachine.status;
+
+  cncMachine.status = 'HOLD';
+
+  try {
+    cncMachine.handleGrblLine('<Run|MPos:1.000,2.000,3.000|FS:60,0>');
+
+    assert.equal(cncMachine.status, 'RUN');
+  } finally {
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});

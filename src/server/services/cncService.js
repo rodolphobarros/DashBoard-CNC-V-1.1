@@ -165,8 +165,12 @@ class CNCService {
   }
 
   hold() {
+    if (this.activeSource === 'MACHINE') {
+      return cncMachine.hold();
+    }
+
     if (this.activeSource !== 'SIMULATOR') {
-      throw new Error('No simulator connected');
+      throw new Error('No CNC connected');
     }
 
     cncSimulator.hold();

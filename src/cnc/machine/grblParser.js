@@ -6,7 +6,8 @@ function parseStatusReport(line) {
   const content = line.slice(1, -1);
   const fields = content.split('|');
 
-  const status = fields.shift();
+  const statusField = fields.shift();
+  const status = statusField.split(':')[0];
 
   const report = {
     type: 'STATUS',

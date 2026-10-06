@@ -234,6 +234,26 @@ class CNCMachine {
     return this.getData();
   }
 
+  hold() {
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    if (this.status !== 'RUN') {
+      throw new Error(`Feed hold is not allowed while Grbl is ${this.status}`);
+    }
+
+    logInfo('Machine', 'Grbl realtime command: Feed Hold (!)');
+
+    this.serialConnection.write('!');
+
+    return this.getData();
+  }
+
   async sendGcodeLine(line) {
     if (!this.serialConnection.isOpen()) {
       throw new Error('Serial port is not open');

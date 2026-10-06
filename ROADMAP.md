@@ -389,7 +389,7 @@
 - [x] Identificar no backend se existe um G-code carregado
 - [x] Bloquear JOG enquanto existir um G-code carregado
 - [x] Permitir substituir o G-code carregado por um novo arquivo
-- [ ] Permitir reutilizar o mesmo `execute.gcode` em múltiplas execuções — `só se der tempo`
+- [x] Permitir reutilizar o mesmo `execute.gcode` em múltiplas execuções — `só se der tempo`
 
 ## 3.2 Estado do programa G-code
 
@@ -412,10 +412,10 @@
 - [x] Enviar comandos G-code ao Grbl pela comunicação serial
 - [x] Controlar o avanço das linhas durante a execução
 - [x] Impedir nova execução enquanto o programa estiver executando
-- [ ] Atualizar o progresso da execução no Dashboard
 - [x] Detectar o fim do programa
 - [x] Retornar o programa ao estado disponível para nova execução
-- [ ] Validar execuções consecutivas do mesmo `execute.gcode`
+- [ ] Validar execuções consecutivas do mesmo `execute.gcode` — `bônus: fazer apenas se der tempo`
+- [ ] Atualizar o progresso da execução no Dashboard — `bônus: fazer apenas se der tempo`
 
 ## 3.4 JOG da máquina real
 
@@ -445,9 +445,9 @@
 
 ## 3.6 Pausa, retomada e emergência
 
-- [ ] Definir os estados em que o controle de execução é permitido
-- [ ] Implementar pausa real utilizando o mecanismo adequado do Grbl
-- [ ] Atualizar o estado da máquina para `HOLD` durante a pausa
+- [x] Definir os estados em que o controle de execução é permitido
+- [x] Implementar pausa real utilizando o mecanismo adequado do Grbl
+- [x] Atualizar o estado da máquina para `HOLD` durante a pausa
 - [ ] Implementar retomada da execução após pausa
 - [ ] Sincronizar pausa e retomada com o Dashboard
 - [ ] Implementar a ação de emergência para a máquina real

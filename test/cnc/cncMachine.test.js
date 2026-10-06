@@ -107,3 +107,54 @@ test('rejects command when Grbl acknowledgement times out', async () => {
     restore();
   }
 });
+
+test('sends Grbl Feed Hold realtime command while machine is running', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalStatus = cncMachine.status;
+
+  cncMachine.status = 'RUN';
+
+  try {
+    const state = cncMachine.hold();
+
+    assert.deepEqual(fakeSerialConnection.writes, ['!']);
+    assert.equal(state.status, 'RUN');
+  } finally {
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+
+test('rejects Feed Hold when Grbl is not running', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalStatus = cncMachine.status;
+
+  cncMachine.status = 'IDLE';
+
+  try {
+    assert.throws(
+      () => cncMachine.hold(),
+      /Feed hold is not allowed while Grbl is IDLE/
+    );
+
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+test('updates machine status to HOLD from Grbl Hold status report', () => {
+  const { restore } = prepareConnectedMachine();
+  const originalStatus = cncMachine.status;
+
+  cncMachine.status = 'RUN';
+
+  try {
+    cncMachine.handleGrblLine('<Hold:0|MPos:1.000,2.000,3.000|FS:0,0>');
+
+    assert.equal(cncMachine.status, 'HOLD');
+  } finally {
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});

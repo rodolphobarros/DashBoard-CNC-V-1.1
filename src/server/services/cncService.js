@@ -152,6 +152,68 @@ class CNCService {
     return cncMachine.waitUntilIdle();
   }
 
+  async waitUntilExecutionCanContinue() {
+    if (this.activeSource !== 'MACHINE') {
+      throw new Error('No CNC machine connected');
+    }
+
+    const evaluateState = (state) => {
+      if (state.connection !== 'CONNECTED') {
+        throw new Error('CNC communication lost during G-code execution');
+      }
+
+      if (state.emergency) {
+        throw new Error('G-code execution interrupted by emergency');
+      }
+
+      if (state.status === 'ALARM') {
+        throw new Error('G-code execution interrupted by Grbl ALARM');
+      }
+
+      return state.status !== 'HOLD';
+    };
+
+    const currentState = this.getState();
+
+    if (evaluateState(currentState)) {
+      return currentState;
+    }
+
+    return new Promise((resolve, reject) => {
+      let unsubscribe = null;
+
+      const listener = (state) => {
+        try {
+          if (!evaluateState(state)) {
+            return;
+          }
+
+          unsubscribe?.();
+          resolve(state);
+        } catch (error) {
+          unsubscribe?.();
+          reject(error);
+        }
+      };
+
+      unsubscribe = this.subscribe(listener);
+
+      // Recheck after subscribing so a state change cannot be missed
+      // between the first check and listener registration.
+      try {
+        const latestState = this.getState();
+
+        if (evaluateState(latestState)) {
+          unsubscribe();
+          resolve(latestState);
+        }
+      } catch (error) {
+        unsubscribe();
+        reject(error);
+      }
+    });
+  }
+
   async jog(command) {
     if (this.activeSource !== 'MACHINE') {
       throw new Error('JOG is only available for the real machine');
@@ -201,8 +263,14 @@ class CNCService {
   }
 
   emergencyStop() {
+    this.lockJog();
+
+    if (this.activeSource === 'MACHINE') {
+      return cncMachine.emergencyStop();
+    }
+
     if (this.activeSource !== 'SIMULATOR') {
-      throw new Error('No simulator connected');
+      throw new Error('No CNC connected');
     }
 
     cncSimulator.activateEmergency();
@@ -215,8 +283,12 @@ class CNCService {
   }
 
   resetEmergency() {
+    if (this.activeSource === 'MACHINE') {
+      return cncMachine.resetEmergency();
+    }
+
     if (this.activeSource !== 'SIMULATOR') {
-      throw new Error('No simulator connected');
+      throw new Error('No CNC connected');
     }
 
     cncSimulator.resetEmergency();

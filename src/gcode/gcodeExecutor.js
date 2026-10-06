@@ -26,6 +26,7 @@ class GcodeExecutor {
       const lines = this.prepareLines(fileContent);
 
       for (const line of lines) {
+        await cncService.waitUntilExecutionCanContinue();
         await cncService.sendGcodeLine(line);
       }
 

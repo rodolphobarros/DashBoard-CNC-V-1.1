@@ -209,3 +209,198 @@ test('updates machine status to RUN after Grbl resumes from HOLD', () => {
     restore();
   }
 });
+
+test('sends Grbl Soft Reset and activates emergency state', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+
+  const originalEmergency = cncMachine.emergency;
+  const originalLastEmergencyAt = cncMachine.lastEmergencyAt;
+  const originalEmergencyCount = cncMachine.emergencyCount;
+
+  cncMachine.emergency = false;
+  cncMachine.lastEmergencyAt = null;
+  cncMachine.emergencyCount = 0;
+
+  try {
+    const state = cncMachine.emergencyStop();
+
+    assert.deepEqual(fakeSerialConnection.writes, ['\x18']);
+
+    assert.equal(state.emergency, true);
+    assert.equal(state.emergencyCount, 1);
+    assert.equal(typeof state.lastEmergencyAt, 'string');
+
+    assert.equal(state.capabilities.emergency, true);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.lastEmergencyAt = originalLastEmergencyAt;
+    cncMachine.emergencyCount = originalEmergencyCount;
+    restore();
+  }
+});
+
+test('rejects G-code while emergency is active', async () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+
+  cncMachine.emergency = true;
+
+  try {
+    await assert.rejects(
+      cncMachine.sendGcodeLine('G0 X1'),
+      /G-code is not allowed while emergency is active/
+    );
+
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    restore();
+  }
+});
+
+test('rejects G-code while Grbl is in ALARM', async () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+  const originalStatus = cncMachine.status;
+
+  cncMachine.emergency = false;
+  cncMachine.status = 'ALARM';
+
+  try {
+    await assert.rejects(
+      cncMachine.sendGcodeLine('G0 X1'),
+      /G-code is not allowed while Grbl is ALARM/
+    );
+
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+
+test('rejects JOG while emergency is active', async () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+  const originalStatus = cncMachine.status;
+
+  cncMachine.emergency = true;
+  cncMachine.status = 'IDLE';
+
+  try {
+    await assert.rejects(
+      cncMachine.jog({
+        axis: 'x',
+        direction: 1,
+        step: 1,
+      }),
+      /JOG is not allowed while emergency is active/
+    );
+
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+
+test('rejects JOG while Grbl is in ALARM', async () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+  const originalStatus = cncMachine.status;
+
+  cncMachine.emergency = false;
+  cncMachine.status = 'ALARM';
+
+  try {
+    await assert.rejects(
+      cncMachine.jog({
+        axis: 'x',
+        direction: 1,
+        step: 1,
+      }),
+      /JOG is not allowed while Grbl is ALARM/
+    );
+
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+test('resets emergency while Grbl is IDLE', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+  const originalStatus = cncMachine.status;
+  const originalLastEmergencyAt = cncMachine.lastEmergencyAt;
+  const originalEmergencyCount = cncMachine.emergencyCount;
+
+  cncMachine.emergency = true;
+  cncMachine.status = 'IDLE';
+  cncMachine.lastEmergencyAt = '2026-10-06T12:00:00.000Z';
+  cncMachine.emergencyCount = 1;
+
+  try {
+    const state = cncMachine.resetEmergency();
+
+    assert.equal(state.emergency, false);
+    assert.equal(state.lastEmergencyAt, '2026-10-06T12:00:00.000Z');
+    assert.equal(state.emergencyCount, 1);
+
+    // Resetting the Dashboard emergency must not send anything to Grbl.
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.status = originalStatus;
+    cncMachine.lastEmergencyAt = originalLastEmergencyAt;
+    cncMachine.emergencyCount = originalEmergencyCount;
+    restore();
+  }
+});
+
+test('resets emergency in ALARM without clearing the Grbl alarm', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+  const originalStatus = cncMachine.status;
+
+  cncMachine.emergency = true;
+  cncMachine.status = 'ALARM';
+
+  try {
+    const state = cncMachine.resetEmergency();
+
+    assert.equal(state.emergency, false);
+    assert.equal(state.status, 'ALARM');
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});
+
+test('rejects emergency reset while Grbl is running', () => {
+  const { fakeSerialConnection, restore } = prepareConnectedMachine();
+  const originalEmergency = cncMachine.emergency;
+  const originalStatus = cncMachine.status;
+
+  cncMachine.emergency = true;
+  cncMachine.status = 'RUN';
+
+  try {
+    assert.throws(
+      () => cncMachine.resetEmergency(),
+      /Emergency reset is not allowed while Grbl is RUN/
+    );
+
+    assert.equal(cncMachine.emergency, true);
+    assert.deepEqual(fakeSerialConnection.writes, []);
+  } finally {
+    cncMachine.emergency = originalEmergency;
+    cncMachine.status = originalStatus;
+    restore();
+  }
+});

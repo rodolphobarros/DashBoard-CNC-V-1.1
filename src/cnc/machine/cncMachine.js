@@ -29,6 +29,10 @@ class CNCMachine {
 
     this.alarms = [];
 
+    this.emergency = false;
+    this.lastEmergencyAt = null;
+    this.emergencyCount = 0;
+
     this.stateListeners = new Set();
 
     this.pendingCommand = null;
@@ -221,6 +225,10 @@ class CNCMachine {
       throw new Error('Grbl is not connected');
     }
 
+    if (this.emergency) {
+      throw new Error('JOG is not allowed while emergency is active');
+    }
+
     if (this.status !== 'IDLE' && this.status !== 'JOG') {
       throw new Error(`JOG is not allowed while Grbl is ${this.status}`);
     }
@@ -274,6 +282,61 @@ class CNCMachine {
     return this.getData();
   }
 
+  emergencyStop() {
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    const emergencyError = new Error('Grbl emergency stop activated');
+
+    this.rejectPendingCommand(emergencyError);
+    this.rejectIdleWaiter(emergencyError);
+
+    logInfo('Machine', 'Grbl realtime command: Soft Reset (Ctrl-X)');
+
+    this.serialConnection.write('\x18');
+
+    this.emergency = true;
+    this.lastEmergencyAt = new Date().toISOString();
+    this.emergencyCount += 1;
+
+    this.notifyStateChange();
+
+    return this.getData();
+  }
+
+  resetEmergency() {
+    if (!this.serialConnection.isOpen()) {
+      throw new Error('Serial port is not open');
+    }
+
+    if (this.connection !== 'CONNECTED') {
+      throw new Error('Grbl is not connected');
+    }
+
+    if (!this.emergency) {
+      throw new Error('Emergency is not active');
+    }
+
+    if (this.status !== 'IDLE' && this.status !== 'ALARM') {
+      throw new Error(
+        `Emergency reset is not allowed while Grbl is ${this.status}`
+      );
+    }
+
+    this.emergency = false;
+
+    logInfo('Machine', 'Grbl emergency state reset');
+
+    this.notifyStateChange();
+
+    return this.getData();
+  }
+
   async sendGcodeLine(line) {
     if (!this.serialConnection.isOpen()) {
       throw new Error('Serial port is not open');
@@ -281,6 +344,14 @@ class CNCMachine {
 
     if (this.connection !== 'CONNECTED') {
       throw new Error('Grbl is not connected');
+    }
+
+    if (this.emergency) {
+      throw new Error('G-code is not allowed while emergency is active');
+    }
+
+    if (this.status === 'ALARM') {
+      throw new Error('G-code is not allowed while Grbl is ALARM');
     }
 
     if (this.pendingCommand) {
@@ -621,9 +692,9 @@ class CNCMachine {
       spindleTemp: null,
       humidity: this.humidity,
 
-      emergency: false,
-      lastEmergencyAt: null,
-      emergencyCount: 0,
+      emergency: this.emergency,
+      lastEmergencyAt: this.lastEmergencyAt,
+      emergencyCount: this.emergencyCount,
 
       holdReason: null,
 
@@ -633,7 +704,7 @@ class CNCMachine {
 
       capabilities: {
         jog: true,
-        emergency: false,
+        emergency: true,
       },
     };
   }

@@ -448,13 +448,13 @@
 - [x] Definir os estados em que o controle de execução é permitido
 - [x] Implementar pausa real utilizando o mecanismo adequado do Grbl
 - [x] Atualizar o estado da máquina para `HOLD` durante a pausa
-- [ ] Implementar retomada da execução após pausa
-- [ ] Sincronizar pausa e retomada com o Dashboard
-- [ ] Implementar a ação de emergência para a máquina real
-- [ ] Bloquear novos movimentos durante emergência ou `ALARM`
-- [ ] Definir o procedimento de reposição após emergência
-- [ ] Tratar perda da comunicação durante pausa ou execução
-- [ ] Encaminhar erros e mudanças de estado ao Dashboard
+- [x] Implementar retomada da execução após pausa
+- [x] Sincronizar pausa e retomada com o Dashboard
+- [x] Implementar a ação de emergência para a máquina real
+- [x] Bloquear novos movimentos durante emergência ou `ALARM`
+- [x] Definir o procedimento de reposição após emergência
+- [x] Tratar perda da comunicação durante pausa ou execução
+- [x] Encaminhar erros e mudanças de estado ao Dashboard
 
 ---
 

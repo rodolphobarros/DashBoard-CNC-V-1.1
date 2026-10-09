@@ -335,20 +335,19 @@
 ## 2.5 Inicialização automática
 
 - [x] Criar serviço `systemd` para o µStreamer
-- [x] Habilitar inicialização automática da câmera
-- [x] Validar o µStreamer após inicialização
+- [x] Confirmar inicialização automática do µStreamer
+- [x] Confirmar disponibilidade da câmera após boot
 - [x] Definir estratégia de inicialização automática do Dashboard
 - [x] Configurar inicialização automática dos containers
 - [x] Garantir reinicialização do Dashboard após falha
 - [x] Garantir disponibilidade da serial após inicialização
-- [x] Garantir disponibilidade da câmera após inicialização
 - [x] Validar ordem de inicialização dos serviços
 - [x] Validar funcionamento completo após reiniciar o Raspberry Pi
 
 ## 2.6 Fluxo de atualização
 
 - [x] Configurar acesso do Raspberry Pi ao repositório Git
-- [ ] Definir procedimento para atualizar o código com Git
+- [x] Definir procedimento para atualizar o código com Git
 - [ ] Definir procedimento para reconstruir a imagem Docker
 - [ ] Definir procedimento para recriar os containers
 - [ ] Preservar configurações locais durante atualizações
@@ -465,11 +464,11 @@
 - [x] Definir níveis básicos de log
 - [x] Padronizar as mensagens de log do backend
 - [x] Registrar conexão e desconexão da CNC
-- [ ] Registrar comandos relevantes enviados ao Grbl
+- [x] Registrar comandos relevantes enviados ao Grbl
 - [x] Registrar respostas `ok`, `error` e `ALARM`
-- [ ] Registrar início, conclusão e falha da execução de G-code
-- [ ] Registrar falhas e timeouts de comandos
-- [ ] Registrar perda e recuperação da comunicação serial
+- [x] Registrar início, conclusão e falha da execução de G-code
+- [x] Registrar falhas e timeouts de comandos
+- [x] Registrar perda e recuperação da comunicação serial
 - [x] Evitar excesso de logs das consultas periódicas de estado
 - [x] Validar os logs no ambiente de produção do Raspberry Pi
 
@@ -493,26 +492,37 @@
 - [x] Confirmar transição `READY → RUNNING`
 - [x] Confirmar envio controlado das linhas ao Grbl
 - [x] Confirmar movimento físico correspondente ao programa
-- [ ] Confirmar atualização do progresso no Dashboard
 - [x] Confirmar detecção do fim e retorno ao estado disponível
 - [x] Confirmar que o arquivo permanece carregado após a execução
-- [ ] Executar novamente o mesmo `execute.gcode`
-- [ ] Confirmar que o JOG permanece bloqueado enquanto houver arquivo carregado
+- [x] Executar novamente o mesmo `execute.gcode`
+- [x] Confirmar que o JOG permanece bloqueado durante a execução do G-code
+- [ ] Confirmar atualização do progresso no Dashboard — `bônus: fazer apenas se der tempo`
 
 ## 4.4 Testes de falha e segurança
 
 - [x] Validar rejeição de movimento sem máquina conectada
 - [x] Validar bloqueio de comandos concorrentes incompatíveis
-- [ ] Validar pausa durante movimento
-- [ ] Validar retomada após pausa
-- [ ] Validar comportamento da emergência
-- [ ] Validar comportamento durante estado `ALARM`
+- [x] Validar pausa durante movimento
+- [x] Validar retomada após pausa
+- [x] Validar comportamento da emergência
+- [x] Validar comportamento durante estado `ALARM`
 - [x] Validar tratamento de respostas `error:n` do Grbl
 - [x] Validar timeout de comando
-- [ ] Validar perda da comunicação durante operação
-- [ ] Confirmar recuperação controlada após falha
+- [x] Validar perda da comunicação durante operação
+- [x] Confirmar recuperação controlada após falha
 
----
+## 4.5 Robustez da comunicação serial
+
+- [x] Tratar erro da porta serial após a abertura
+- [x] Tratar fechamento inesperado da porta serial
+- [x] Detectar remoção do cabo USB durante a operação
+- [x] Notificar os clientes após perda da comunicação serial
+- [x] Rejeitar comandos pendentes após falha da comunicação
+- [x] Limpar dados do Grbl que não sejam mais confiáveis após desconexão
+- [ ] Impedir que respostas antigas confirmem comandos após reconexão
+- [ ] Detectar reinicialização inesperada do Grbl durante uma conexão ativa
+- [ ] Recuperar de forma controlada a comunicação após reinicialização do Grbl
+- [ ] Validar reconexão e retomada segura após falhas sucessivas
 
 # 5 — Limites, homing, configuração e sensores
 
